@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">HelloWorld</string>
+    <string name="xin_ch_o">Xin chào</string>
+    <string name="tho_t">Thoát</string>
+</resources>
