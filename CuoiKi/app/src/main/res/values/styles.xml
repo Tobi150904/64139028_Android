@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Màu sắc chủ đạo -->
+    <color name="primaryColor">#6200EE</color>
+    <color name="primaryLightColor">#BB86FC</color>
+    <color name="primaryTextColor">#FFFFFF</color>
+    <color name="backgroundColor">#F5F5F5</color>
+    <color name="white">#FFFFFF</color>
+</resources>
