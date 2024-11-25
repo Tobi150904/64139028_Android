@@ -1,9 +1,13 @@
 package vn.ngoviethoang.duancuoiky.Data.Dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
+import java.util.Date;
 import java.util.List;
 import vn.ngoviethoang.duancuoiky.Data.Entity.ThuNhap;
 
@@ -12,10 +16,14 @@ public interface ThuNhapDao {
     @Insert
     void insertThuNhap(ThuNhap thuNhap);
 
-    @Query("SELECT * FROM thu_nhap")
-    List<ThuNhap> getAllThuNhap();
+    @Update
+    void updateThuNhap(ThuNhap thuNhap);
 
-    @Query("DELETE FROM thu_nhap WHERE id = :id")
-    void deleteThuNhap(int id);
+    @Delete
+    void deleteThuNhap(ThuNhap thuNhap);
+
+    @Query("SELECT * FROM thu_nhap WHERE ngayThang BETWEEN :startDate AND :endDate")
+    LiveData<List<ThuNhap>> getThuNhapByDateRange(Date startDate, Date endDate);
 }
+
 

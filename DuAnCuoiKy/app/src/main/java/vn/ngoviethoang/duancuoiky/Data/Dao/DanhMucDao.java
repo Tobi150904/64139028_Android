@@ -1,5 +1,6 @@
 package vn.ngoviethoang.duancuoiky.Data.Dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -13,8 +14,6 @@ public interface DanhMucDao {
     void insertDanhMuc(DanhMuc danhMuc);
 
     @Query("SELECT * FROM danh_muc")
-    List<DanhMuc> getAllDanhMuc();
-
-    @Query("DELETE FROM danh_muc WHERE id = :id")
-    void deleteDanhMuc(int id);
+    LiveData<List<DanhMuc>> getAllDanhMuc();
 }
+

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="16dp">
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thêm giao dịch"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/primaryColor"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Transaction Type -->
+    <RadioGroup
+        android:id="@+id/transactionTypeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/incomeOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thu nhập"
+            android:buttonTint="@color/primaryColor" />
+
+        <RadioButton
+            android:id="@+id/expenseOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chi tiêu"
+            android:layout_marginStart="16dp"
+            android:buttonTint="@color/primaryColor" />
+    </RadioGroup>
+
+    <!-- Amount -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Số tiền"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/amountInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="Nhập số tiền" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Category -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Danh mục"
+        android:layout_marginBottom="16dp">
+
+        <Spinner
+            android:id="@+id/categoryInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Date Picker -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/dateLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ngày"
+            android:textSize="16sp"
+            android:textColor="@color/black" />
+
+        <Button
+            android:id="@+id/selectDateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Chọn ngày"
+            android:backgroundTint="@color/primaryColor"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <!-- Note -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ghi chú"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/noteInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:hint="Thêm ghi chú" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Attach Image -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/addImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thêm ảnh"
+            android:backgroundTint="@color/primaryColor"
+            android:textColor="@color/white" />
+
+        <ImageView
+            android:id="@+id/previewImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_placeholder"
+            android:layout_marginStart="16dp"
+            android:contentDescription="Preview Image" />
+    </LinearLayout>
+
+    <!-- Recurring Transaction -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nhắc lại giao dịch"
+            android:textSize="16sp"
+            android:textColor="@color/black" />
+
+        <Switch
+            android:id="@+id/recurringSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/saveTransactionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lưu giao dịch"
+        android:backgroundTint="@color/primaryColor"
+        android:textColor="@color/white"
+        android:layout_marginTop="16dp" />
+    </LinearLayout>
+</ScrollView>

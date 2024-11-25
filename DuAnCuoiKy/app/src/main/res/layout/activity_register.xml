@@ -20,6 +20,7 @@
 
     <!-- Email Input -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/emailInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Email"
@@ -39,6 +40,7 @@
 
     <!-- Password Input -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Mật khẩu"
@@ -53,41 +55,39 @@
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Forgot Password -->
-    <TextView
-        android:id="@+id/forgotPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Quên mật khẩu?"
-        android:textColor="@color/primaryColor"
-        android:layout_gravity="end"
-        android:layout_marginBottom="24dp"
-        android:clickable="true"
-        android:focusable="true" />
-
-    <!-- Login Button -->
-    <Button
-        android:id="@+id/loginButton"
+    <!-- Confirm Password Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/confirmPasswordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Đăng nhập"
+        android:hint="Xác nhận mật khẩu"
+        android:layout_marginBottom="16dp"
+        app:helperText="Mật khẩu phải khớp với mật khẩu đã nhập"
+        app:errorEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/confirmPasswordInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Register Button -->
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng ký"
         android:backgroundTint="@color/primaryColor"
         android:textColor="@color/white"
         android:layout_marginBottom="16dp" />
 
-    <!-- Google Sign-In -->
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/googleSignInButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Register Link -->
+    <!-- Already have an account -->
     <TextView
-        android:id="@+id/registerLink"
+        android:id="@+id/loginLink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bạn chưa có tài khoản? Đăng ký ngay"
+        android:text="Bạn đã có tài khoản? Đăng nhập"
         android:textColor="@color/primaryColor"
         android:layout_gravity="center" />
 </LinearLayout>

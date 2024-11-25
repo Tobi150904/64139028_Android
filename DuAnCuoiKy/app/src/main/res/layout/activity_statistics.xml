@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="16dp"
     android:background="@color/white">
 
     <!-- Header -->
@@ -15,37 +16,61 @@
         android:background="@color/primaryColor">
 
         <TextView
-            android:id="@+id/welcomeText"
+            android:id="@+id/statisticsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Xin chào, [Tên người dùng]"
+            android:text="Thống kê tài chính"
             android:textColor="@color/white"
-            android:textSize="18sp"
-            android:layout_alignParentStart="true" />
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/profileIcon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_profile"
+            android:id="@+id/filterIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_filter"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="Profile Icon" />
+            android:contentDescription="Filter Icon"
+            android:layout_marginEnd="8dp" />
     </RelativeLayout>
 
-    <!-- Summary Cards -->
+    <!-- Filter Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:weightSum="3"
         android:layout_marginBottom="16dp">
 
-        <!-- Income Card -->
+        <Spinner
+            android:id="@+id/categoryFilter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/card_background" />
+
+        <Button
+            android:id="@+id/compareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="So sánh tháng"
+            android:backgroundTint="@color/primaryColor"
+            android:textColor="@color/white"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- Summary Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:weightSum="3">
+
+        <!-- Income Summary -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="120dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
             android:orientation="vertical"
             android:background="@drawable/card_background"
@@ -53,7 +78,7 @@
             android:layout_marginEnd="8dp">
 
             <TextView
-                android:id="@+id/incomeLabel"
+                android:id="@+id/incomeSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thu nhập"
@@ -70,10 +95,10 @@
                 android:textSize="20sp" />
         </LinearLayout>
 
-        <!-- Expense Card -->
+        <!-- Expense Summary -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="120dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
             android:orientation="vertical"
             android:background="@drawable/card_background"
@@ -81,7 +106,7 @@
             android:layout_marginEnd="8dp">
 
             <TextView
-                android:id="@+id/expenseLabel"
+                android:id="@+id/expenseSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Chi tiêu"
@@ -98,17 +123,17 @@
                 android:textSize="20sp" />
         </LinearLayout>
 
-        <!-- Balance Card -->
+        <!-- Balance Summary -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="120dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
             android:orientation="vertical"
             android:background="@drawable/card_background"
             android:padding="8dp">
 
             <TextView
-                android:id="@+id/balanceLabel"
+                android:id="@+id/balanceSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Số dư"
@@ -126,48 +151,78 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Donut Chart -->
+    <!-- Chart Section -->
     <FrameLayout
-        android:id="@+id/chartContainer"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_margin="16dp"
         android:background="@drawable/card_background"
-        android:padding="16dp">
-        <!-- Placeholder for Chart -->
+        android:layout_marginBottom="16dp">
+
         <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/pieChart"
+            android:id="@+id/categoryPieChart"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center" />
+            android:layout_height="match_parent" />
     </FrameLayout>
+
+    <!-- Financial Forecast Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/card_background"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/forecastTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dự đoán tài chính"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/forecastValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 VND"
+            android:textColor="@color/blue"
+            android:textStyle="bold"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <!-- Budget Suggestion Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/card_background"
+        android:layout_marginTop="16dp">
+
+        <TextView
+        android:id="@+id/budgetSuggestionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gợi ý ngân sách"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/budgetSuggestionValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 VND"
+            android:textColor="@color/green"
+            android:textStyle="bold"
+            android:textSize="20sp" />
+    </LinearLayout>
 
     <!-- Recent Transactions List -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recentTransactionsList"
+        android:id="@+id/transactionList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp"
-        android:clipToPadding="false" />
-
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:menu="@menu/bottom_navigation_menu"
-        android:background="@color/white"
-        app:itemIconTint="@color/primaryColor"
-        app:itemTextColor="@color/primaryColor" />
-
-    <!-- Floating Action Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addTransactionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_add"
-        android:contentDescription="Add Transaction" />
+        android:padding="8dp" />
 </LinearLayout>

@@ -45,7 +45,10 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.room.runtime)
+    implementation(libs.play.services.base)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")  // Annotation Processor cho Glide
+
+    implementation(libs.play.services.auth)
 
     // Test dependencies
     testImplementation(libs.junit)

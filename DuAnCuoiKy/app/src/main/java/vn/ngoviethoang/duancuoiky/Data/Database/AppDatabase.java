@@ -3,6 +3,8 @@ package vn.ngoviethoang.duancuoiky.Data.Database;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
+
 import android.content.Context;
 
 import vn.ngoviethoang.duancuoiky.Data.Dao.ChiTieuDao;
@@ -13,6 +15,7 @@ import vn.ngoviethoang.duancuoiky.Data.Entity.DanhMuc;
 import vn.ngoviethoang.duancuoiky.Data.Entity.ThuNhap;
 
 @Database(entities = {ChiTieu.class, ThuNhap.class, DanhMuc.class}, version = 1)
+@TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract ChiTieuDao chiTieuDao();
     public abstract ThuNhapDao thuNhapDao();
@@ -26,7 +29,6 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "money_manager_database")
-                            .allowMainThreadQueries() // Dành cho test, nên chuyển sang background thread khi triển khai thực tế
                             .build();
                 }
             }
@@ -34,4 +36,5 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 }
+
 

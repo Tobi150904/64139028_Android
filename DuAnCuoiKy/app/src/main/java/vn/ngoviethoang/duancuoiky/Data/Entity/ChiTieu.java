@@ -1,23 +1,39 @@
 package vn.ngoviethoang.duancuoiky.Data.Entity;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
-@Entity(tableName = "chi_tieu")
+import java.util.Date;
+
+import vn.ngoviethoang.duancuoiky.Data.Database.DateConverter;
+
+@Entity(
+        tableName = "chi_tieu",
+        foreignKeys = @ForeignKey(
+                entity = DanhMuc.class,
+                parentColumns = "id",
+                childColumns = "danhMucId",
+                onDelete = ForeignKey.CASCADE
+        )
+)
+@TypeConverters(DateConverter.class)
 public class ChiTieu {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
-    public String tenDanhMuc; // Tên danh mục chi tiêu
-    public float soTien;      // Số tiền chi tiêu
-    public String ngayThang;  // Ngày thực hiện chi tiêu
+    public int danhMucId; // Khóa ngoại
+    public float soTien;
+    public Date ngayThang;
 
-    public ChiTieu(String tenDanhMuc, float soTien, String ngayThang) {
-        this.tenDanhMuc = tenDanhMuc;
+    public ChiTieu(int danhMucId, float soTien, Date ngayThang) {
+        this.danhMucId = danhMucId;
         this.soTien = soTien;
         this.ngayThang = ngayThang;
     }
-    // Các phương thức getter và setter cho các thuộc tính
+
+    // Getter và Setter
     public int getId() {
         return id;
     }
@@ -26,12 +42,12 @@ public class ChiTieu {
         this.id = id;
     }
 
-    public String getTenDanhMuc() {
-        return tenDanhMuc;
+    public int getDanhMucId() {
+        return danhMucId;
     }
 
-    public void setTenDanhMuc(String tenDanhMuc) {
-        this.tenDanhMuc = tenDanhMuc;
+    public void setDanhMucId(int danhMucId) {
+        this.danhMucId = danhMucId;
     }
 
     public float getSoTien() {
@@ -42,22 +58,11 @@ public class ChiTieu {
         this.soTien = soTien;
     }
 
-    public String getNgayThang() {
+    public Date getNgayThang() {
         return ngayThang;
     }
 
-    public void setNgayThang(String ngayThang) {
+    public void setNgayThang(Date ngayThang) {
         this.ngayThang = ngayThang;
     }
-
-    @Override
-    public String toString() {
-        return "ChiTieu{" +
-                "id=" + id +
-                ", tenDanhMuc='" + tenDanhMuc + '\'' +
-                ", soTien=" + soTien +
-                ", ngayThang='" + ngayThang + '\'' +
-                '}';
-    }
 }
-

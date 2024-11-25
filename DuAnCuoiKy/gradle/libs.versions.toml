@@ -11,6 +11,8 @@ roomCommon = "2.6.1"
 mpandroidchart = "3.1.0"
 roomRuntime = "2.6.1"
 roomCompiler = "2.6.1"
+playServicesBase = "18.5.0"
+googlePlayServicesAuth = "20.1.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -24,6 +26,8 @@ room-common = { group = "androidx.room", name = "room-common", version.ref = "ro
 mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
+play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "googlePlayServicesAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
