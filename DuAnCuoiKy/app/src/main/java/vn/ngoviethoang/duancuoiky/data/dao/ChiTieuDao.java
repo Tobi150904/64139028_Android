@@ -1,4 +1,4 @@
-package vn.ngoviethoang.duancuoiky.Data.Dao;
+package vn.ngoviethoang.duancuoiky.data.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -10,7 +10,7 @@ import androidx.room.Update;
 import java.util.Date;
 import java.util.List;
 
-import vn.ngoviethoang.duancuoiky.Data.Entity.ChiTieu;
+import vn.ngoviethoang.duancuoiky.data.entity.ChiTieu;
 
 @Dao
 public interface ChiTieuDao {

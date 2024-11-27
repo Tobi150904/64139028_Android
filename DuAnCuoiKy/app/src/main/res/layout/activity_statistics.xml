@@ -6,21 +6,21 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@color/white">
+    android:background="@color/White">
 
     <!-- Header -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="@color/primaryColor">
+        android:background="@color/Primary">
 
         <TextView
             android:id="@+id/statisticsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Thống kê tài chính"
-            android:textColor="@color/white"
+            android:textColor="@color/White"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -53,8 +53,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="So sánh tháng"
-            android:backgroundTint="@color/primaryColor"
-            android:textColor="@color/white"
+            android:backgroundTint="@color/Primary"
+            android:textColor="@color/White"
             android:layout_marginStart="8dp" />
     </LinearLayout>
 
@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thu nhập"
-                android:textColor="@color/black"
+                android:textColor="@color/Black"
                 android:textSize="16sp" />
 
             <TextView
@@ -90,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 VND"
-                android:textColor="@color/green"
+                android:textColor="@color/Green"
                 android:textStyle="bold"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -110,7 +110,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Chi tiêu"
-                android:textColor="@color/black"
+                android:textColor="@color/Black"
                 android:textSize="16sp" />
 
             <TextView
@@ -118,7 +118,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 VND"
-                android:textColor="@color/red"
+                android:textColor="@color/Red"
                 android:textStyle="bold"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -137,7 +137,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Số dư"
-                android:textColor="@color/black"
+                android:textColor="@color/Black"
                 android:textSize="16sp" />
 
             <TextView
@@ -145,7 +145,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 VND"
-                android:textColor="@color/blue"
+                android:textColor="@color/Blue"
                 android:textStyle="bold"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -178,7 +178,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Dự đoán tài chính"
-            android:textColor="@color/black"
+            android:textColor="@color/Black"
             android:textSize="16sp" />
 
         <TextView
@@ -186,7 +186,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 VND"
-            android:textColor="@color/blue"
+            android:textColor="@color/Blue"
             android:textStyle="bold"
             android:textSize="20sp" />
     </LinearLayout>
@@ -205,7 +205,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Gợi ý ngân sách"
-        android:textColor="@color/black"
+        android:textColor="@color/Black"
         android:textSize="16sp" />
 
         <TextView
@@ -213,7 +213,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 VND"
-            android:textColor="@color/green"
+            android:textColor="@color/Green"
             android:textStyle="bold"
             android:textSize="20sp" />
     </LinearLayout>

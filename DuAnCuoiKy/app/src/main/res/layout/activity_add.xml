@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/White"
     android:padding="16dp">
 
     <LinearLayout
@@ -19,7 +19,7 @@
         android:text="Thêm giao dịch"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/primaryColor"
+        android:textColor="@color/Primary"
         android:layout_marginBottom="24dp" />
 
     <!-- Transaction Type -->
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Thu nhập"
-            android:buttonTint="@color/primaryColor" />
+            android:buttonTint="@color/Primary" />
 
         <RadioButton
             android:id="@+id/expenseOption"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="Chi tiêu"
             android:layout_marginStart="16dp"
-            android:buttonTint="@color/primaryColor" />
+            android:buttonTint="@color/Primary" />
     </RadioGroup>
 
     <!-- Amount -->
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:text="Ngày"
             android:textSize="16sp"
-            android:textColor="@color/black" />
+            android:textColor="@color/Black" />
 
         <Button
             android:id="@+id/selectDateButton"
@@ -96,8 +96,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Chọn ngày"
-            android:backgroundTint="@color/primaryColor"
-            android:textColor="@color/white" />
+            android:backgroundTint="@color/Primary"
+            android:textColor="@color/White" />
     </LinearLayout>
 
     <!-- Note -->
@@ -128,8 +128,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Thêm ảnh"
-            android:backgroundTint="@color/primaryColor"
-            android:textColor="@color/white" />
+            android:backgroundTint="@color/Primary"
+            android:textColor="@color/White" />
 
         <ImageView
             android:id="@+id/previewImage"
@@ -153,7 +153,7 @@
             android:layout_height="wrap_content"
             android:text="Nhắc lại giao dịch"
             android:textSize="16sp"
-            android:textColor="@color/black" />
+            android:textColor="@color/Black" />
 
         <Switch
             android:id="@+id/recurringSwitch"
@@ -168,8 +168,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Lưu giao dịch"
-        android:backgroundTint="@color/primaryColor"
-        android:textColor="@color/white"
+        android:backgroundTint="@color/Primary"
+        android:textColor="@color/White"
         android:layout_marginTop="16dp" />
     </LinearLayout>
 </ScrollView>

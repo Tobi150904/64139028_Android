@@ -1,4 +1,4 @@
-package vn.ngoviethoang.duancuoiky.Data.Dao;
+package vn.ngoviethoang.duancuoiky.data.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -6,7 +6,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import java.util.List;
-import vn.ngoviethoang.duancuoiky.Data.Entity.DanhMuc;
+import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
 
 @Dao
 public interface DanhMucDao {

@@ -1,4 +1,4 @@
-package vn.ngoviethoang.duancuoiky.Data.Database;
+package vn.ngoviethoang.duancuoiky.data.database;
 
 import androidx.room.TypeConverter;
 

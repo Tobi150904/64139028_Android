@@ -1,4 +1,4 @@
-package vn.ngoviethoang.duancuoiky.Data.Entity;
+package vn.ngoviethoang.duancuoiky.data.entity;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

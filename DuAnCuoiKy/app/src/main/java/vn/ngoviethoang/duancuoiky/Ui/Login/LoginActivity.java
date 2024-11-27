@@ -1,8 +1,7 @@
-package vn.ngoviethoang.duancuoiky.Ui.Auth;
+package vn.ngoviethoang.duancuoiky.Ui.Login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,14 +32,13 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize Views
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
         loginButton = findViewById(R.id.loginButton);
         forgotPassword = findViewById(R.id.forgotPassword);
         registerLink = findViewById(R.id.registerLink);
 
-        // Google Sign-In setup
+        // Cài đặt Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -52,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         // Handle Forgot Password click
         forgotPassword.setOnClickListener(v -> {
             // TODO: Handle forgot password flow
-            Toast.makeText(LoginActivity.this, "Forgot Password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, "Quên mật khẩu", Toast.LENGTH_SHORT).show();
         });
 
         // Handle Register Link click

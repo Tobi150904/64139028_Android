@@ -1,4 +1,4 @@
-package vn.ngoviethoang.duancuoiky.Data.Repository;
+package vn.ngoviethoang.duancuoiky.data.repository;
 
 import android.content.Context;
 import androidx.lifecycle.LiveData;
@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import vn.ngoviethoang.duancuoiky.Data.Dao.ThuNhapDao;
-import vn.ngoviethoang.duancuoiky.Data.Database.AppDatabase;
-import vn.ngoviethoang.duancuoiky.Data.Entity.ThuNhap;
+import vn.ngoviethoang.duancuoiky.data.dao.ThuNhapDao;
+import vn.ngoviethoang.duancuoiky.data.database.AppDatabase;
+import vn.ngoviethoang.duancuoiky.data.entity.ThuNhap;
 
 public class ThuNhapRepository {
     private ThuNhapDao thuNhapDao;

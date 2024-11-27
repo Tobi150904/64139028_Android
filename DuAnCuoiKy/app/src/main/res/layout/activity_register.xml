@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/White"
     android:padding="16dp">
 
     <!-- Logo -->
@@ -78,8 +78,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Đăng ký"
-        android:backgroundTint="@color/primaryColor"
-        android:textColor="@color/white"
+        android:backgroundTint="@color/Primary"
+        android:textColor="@color/White"
         android:layout_marginBottom="16dp" />
 
     <!-- Already have an account -->
@@ -88,6 +88,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Bạn đã có tài khoản? Đăng nhập"
-        android:textColor="@color/primaryColor"
+        android:textColor="@color/Primary"
         android:layout_gravity="center" />
 </LinearLayout>

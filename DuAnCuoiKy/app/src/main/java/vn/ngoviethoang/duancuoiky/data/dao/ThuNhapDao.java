@@ -1,4 +1,4 @@
-package vn.ngoviethoang.duancuoiky.Data.Dao;
+package vn.ngoviethoang.duancuoiky.data.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -9,7 +9,7 @@ import androidx.room.Update;
 
 import java.util.Date;
 import java.util.List;
-import vn.ngoviethoang.duancuoiky.Data.Entity.ThuNhap;
+import vn.ngoviethoang.duancuoiky.data.entity.ThuNhap;
 
 @Dao
 public interface ThuNhapDao {

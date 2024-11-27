@@ -1,30 +1,38 @@
-package vn.ngoviethoang.duancuoiky.Data.Entity;
+package vn.ngoviethoang.duancuoiky.data.entity;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import java.util.Date;
 
-import vn.ngoviethoang.duancuoiky.Data.Database.DateConverter;
+import vn.ngoviethoang.duancuoiky.data.database.DateConverter;
 
-@Entity(tableName = "thu_nhap")
+@Entity(
+        tableName = "chi_tieu",
+        foreignKeys = @ForeignKey(
+                entity = DanhMuc.class,
+                parentColumns = "id",
+                childColumns = "danhMucId",
+                onDelete = ForeignKey.CASCADE
+        )
+)
 @TypeConverters(DateConverter.class)
-public class ThuNhap {
+public class ChiTieu {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
-    public String tenNguonThu;
+    public int danhMucId;
     public float soTien;
-    public Date ngayThang; // Sử dụng Date thay vì String
+    public Date ngayThang;
 
-    public ThuNhap(String tenNguonThu, float soTien, Date ngayThang) {
-        this.tenNguonThu = tenNguonThu;
+    public ChiTieu(int danhMucId, float soTien, Date ngayThang) {
+        this.danhMucId = danhMucId;
         this.soTien = soTien;
         this.ngayThang = ngayThang;
     }
 
-    // Getter và Setter
     public int getId() {
         return id;
     }
@@ -33,12 +41,12 @@ public class ThuNhap {
         this.id = id;
     }
 
-    public String getTenNguonThu() {
-        return tenNguonThu;
+    public int getDanhMucId() {
+        return danhMucId;
     }
 
-    public void setTenNguonThu(String tenNguonThu) {
-        this.tenNguonThu = tenNguonThu;
+    public void setDanhMucId(int danhMucId) {
+        this.danhMucId = danhMucId;
     }
 
     public float getSoTien() {
