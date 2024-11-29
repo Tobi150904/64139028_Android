@@ -8,24 +8,20 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.Ui.Dashboard.DashboardActivity;
+import vn.ngoviethoang.duancuoiky.data.repository.UserRepository;
 
 public class LoginActivity extends AppCompatActivity {
-
     private TextInputEditText emailInput, passwordInput;
     private TextInputLayout emailInputLayout, passwordInputLayout;
     private Button loginButton;
-    private TextView forgotPassword, registerLink;
-    private GoogleSignInClient googleSignInClient;
-    private static final int RC_SIGN_IN = 9001; // Request code for Google Sign-In
+    private TextView registerLink;
+
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,26 +30,17 @@ public class LoginActivity extends AppCompatActivity {
 
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
+        emailInputLayout = findViewById(R.id.emailInputLayout);
+        passwordInputLayout = findViewById(R.id.passwordInputLayout);
         loginButton = findViewById(R.id.loginButton);
-        forgotPassword = findViewById(R.id.forgotPassword);
         registerLink = findViewById(R.id.registerLink);
 
-        // Cài đặt Google Sign-In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        googleSignInClient = GoogleSignIn.getClient(this, gso);
+        userRepository = new UserRepository(this);
 
-        // Handle Login Button click
+        // Xử lý sự kiện nhấn nút Đăng nhập
         loginButton.setOnClickListener(v -> loginUser());
 
-        // Handle Forgot Password click
-        forgotPassword.setOnClickListener(v -> {
-            // TODO: Handle forgot password flow
-            Toast.makeText(LoginActivity.this, "Quên mật khẩu", Toast.LENGTH_SHORT).show();
-        });
-
-        // Handle Register Link click
+        // Xử lý sự kiện nhấn vào liên kết "Đăng ký"
         registerLink.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
@@ -64,7 +51,6 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
-        // Validate email and password
         if (email.isEmpty()) {
             emailInputLayout.setError("Vui lòng nhập email");
             return;
@@ -82,26 +68,14 @@ public class LoginActivity extends AppCompatActivity {
             passwordInputLayout.setError(null);
         }
 
-        // TODO: Call your authentication API here (e.g., Firebase Auth)
-        // If login is successful, navigate to Dashboard
-        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    // Google Sign-In logic (if applicable)
-    @Override
-    public void onStart() {
-        super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null) {
-            navigateToDashboard();
-        }
-    }
-
-    private void navigateToDashboard() {
-        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-        startActivity(intent);
-        finish();
+        userRepository.loginUser(email, password).observe(this, user -> {
+            if (user != null) {
+                Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(LoginActivity.this, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

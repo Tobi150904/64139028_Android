@@ -3,7 +3,7 @@ package vn.ngoviethoang.duancuoiky.data.entity;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "User")
+@Entity(tableName = "users")
 public class User {
     @PrimaryKey(autoGenerate = true)
     private int id;

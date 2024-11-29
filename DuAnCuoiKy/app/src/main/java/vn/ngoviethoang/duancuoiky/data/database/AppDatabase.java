@@ -14,8 +14,9 @@ import vn.ngoviethoang.duancuoiky.data.dao.UserDao;
 import vn.ngoviethoang.duancuoiky.data.entity.ChiTieu;
 import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
 import vn.ngoviethoang.duancuoiky.data.entity.ThuNhap;
+import vn.ngoviethoang.duancuoiky.data.entity.User;
 
-@Database(entities = {ChiTieu.class, ThuNhap.class, DanhMuc.class}, version = 1)
+@Database(entities = {ChiTieu.class, ThuNhap.class, DanhMuc.class, User.class}, version = 1)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();

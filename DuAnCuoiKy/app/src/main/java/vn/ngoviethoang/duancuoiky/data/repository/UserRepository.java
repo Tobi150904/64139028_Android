@@ -15,7 +15,7 @@ public class UserRepository {
     private final UserDao userDao;
     private final ExecutorService executorService;
 
-    // Constructor khởi tạo UserRepository với AppDatabase
+    // Constructor khởi tạo UserRepository
     public UserRepository(Context context) {
         AppDatabase database = AppDatabase.getDatabase(context);
         userDao = database.userDao();
@@ -34,7 +34,7 @@ public class UserRepository {
         });
     }
 
-    // Kiểm tra thông tin đăng nhập (Đăng nhập)
+    // Kiểm tra thông tin đăng nhập
     public LiveData<User> loginUser(String email, String password) {
         return userDao.getUserByEmailAndPassword(email, password);
     }
@@ -47,8 +47,6 @@ public class UserRepository {
     // Callback để xử lý kết quả bất đồng bộ
     public interface RepositoryCallback {
         void onSuccess(String message);
-
         void onFailure(String errorMessage);
     }
 }
-

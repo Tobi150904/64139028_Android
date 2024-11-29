@@ -23,7 +23,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:src="@drawable/ic_menu"
-            android:contentDescription="Menu Icon" />
+            android:contentDescription="@string/menu_icon" />
 
         <ImageView
             android:id="@+id/icon_list"
@@ -33,7 +33,7 @@
             android:layout_marginTop="16dp"
             android:layout_alignParentEnd="true"
             android:src="@drawable/ic_list"
-            android:contentDescription="Transaction Detail Icon" />
+            android:contentDescription="@string/transaction_detail_icon" />
 
         <TextView
             android:id="@+id/total_balance_label"
@@ -104,8 +104,8 @@
 
     <LinearLayout
         android:id="@+id/body"
-        android:layout_width="342dp"
-        android:layout_height="574dp"
+        android:layout_width="343dp"
+        android:layout_height="677dp"
         android:layout_marginTop="-50dp"
         android:background="@drawable/card_background"
         android:backgroundTint="@color/White"
@@ -189,20 +189,7 @@
                 android:layout_height="300dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/card_background"
-                android:elevation="4dp"
-                app:pci_centerText="Số dư"
-                app:pci_centerTextColor="@color/primary_text_color"
-                app:pci_centerTextSize="16sp"
-                app:pci_drawHole="true"
-                app:pci_drawRoundedSlices="true"
-                app:pci_drawSlicesUnderHole="false"
-                app:pci_holeColor="@android:color/white"
-                app:pci_holeRadius="50f"
-                app:pci_legendHorizontalAlignment="center"
-                app:pci_legendTextSize="12sp"
-                app:pci_legendVerticalAlignment="center"
-                app:pci_sliceSpace="2f"
-                app:pci_usePercentValues="true" />
+                android:elevation="4dp" />
 
             <ImageView
                 android:id="@+id/icon_add_transaction"
@@ -211,7 +198,6 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_margin="16dp"
-                android:background="#FFEB3B"
                 android:contentDescription="Add Transaction"
                 android:padding="10dp"
                 android:src="@drawable/ic_add" />
@@ -227,7 +213,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:background="#E0E0E0"
+                android:background="@drawable/card_background"
+                android:backgroundTint="@color/White"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="10dp">

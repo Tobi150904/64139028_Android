@@ -20,12 +20,11 @@
 
     <!-- Email Input -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/emailInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Email"
-        android:layout_marginBottom="16dp"
-        app:helperText="Nhập email hợp lệ"
-        app:errorEnabled="true">
+        android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/emailInput"
@@ -39,12 +38,11 @@
 
     <!-- Password Input -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Mật khẩu"
-        android:layout_marginBottom="16dp"
-        app:helperText="Mật khẩu phải có ít nhất 6 ký tự"
-        app:errorEnabled="true">
+        android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordInput"

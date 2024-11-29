@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DuAnCuoiKy</string>
+    <string name="menu_icon">Menu Icon</string>
+    <string name="transaction_detail_icon">Transaction Detail Icon</string>
 </resources>
