@@ -4,32 +4,27 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
-
-import com.google.android.material.navigation.NavigationView;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.Ui.AddTransaction.AddTransactionActivity;
-import vn.ngoviethoang.duancuoiky.Ui.TransactionDetailActivity.TransactionDetailActivity;
+import vn.ngoviethoang.duancuoiky.Ui.TransactionDetail.TransactionDetailActivity;
 
 public class DashboardActivity extends AppCompatActivity {
-
-    private TextView dateRange;
-    private EditText totalBalanceAmount;
+    private DashboardViewModel dashboardViewModel;
+    private TextView totalBalanceAmount, dateRange, tabExpenses, tabIncome, tabDay, tabWeek, tabMonth, tabYear, tabCustom;
     private ImageView iconMenu, iconList, iconAdd, iconEditBalance;
-    private TextView tabExpenses, tabIncome, tabDay, tabWeek, tabMonth, tabYear, tabCustom;
     private DrawerLayout drawerLayout;
-    private Calendar startDate, endDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,17 +47,24 @@ public class DashboardActivity extends AppCompatActivity {
         tabCustom = findViewById(R.id.tab_custom);
         drawerLayout = findViewById(R.id.drawer_layout);
 
+        // Initialize ViewModel
+        dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
+
+        // Observe ViewModel
+        dashboardViewModel.getDateRange().observe(this, dateRange::setText);
+        dashboardViewModel.getTabSelected().observe(this, this::updateTabUI);
+
         // Set click listeners
         iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(findViewById(R.id.nav_view)));
         iconList.setOnClickListener(v -> startActivity(new Intent(this, TransactionDetailActivity.class)));
         iconAdd.setOnClickListener(v -> startActivity(new Intent(this, AddTransactionActivity.class)));
         iconEditBalance.setOnClickListener(v -> enableBalanceEditing());
-        tabExpenses.setOnClickListener(v -> switchTab("expenses"));
-        tabIncome.setOnClickListener(v -> switchTab("income"));
-        tabDay.setOnClickListener(v -> updateDateRange("day"));
-        tabWeek.setOnClickListener(v -> updateDateRange("week"));
-        tabMonth.setOnClickListener(v -> updateDateRange("month"));
-        tabYear.setOnClickListener(v -> updateDateRange("year"));
+        tabExpenses.setOnClickListener(v -> dashboardViewModel.switchTab("expenses"));
+        tabIncome.setOnClickListener(v -> dashboardViewModel.switchTab("income"));
+        tabDay.setOnClickListener(v -> dashboardViewModel.updateDateRange("day"));
+        tabWeek.setOnClickListener(v -> dashboardViewModel.updateDateRange("week"));
+        tabMonth.setOnClickListener(v -> dashboardViewModel.updateDateRange("month"));
+        tabYear.setOnClickListener(v -> dashboardViewModel.updateDateRange("year"));
         tabCustom.setOnClickListener(v -> showDatePicker());
     }
 
@@ -72,64 +74,28 @@ public class DashboardActivity extends AppCompatActivity {
         totalBalanceAmount.requestFocus();
     }
 
-    private void switchTab(String tab) {
+    private void updateTabUI(String tab) {
         if (tab.equals("expenses")) {
             tabExpenses.setTextColor(getResources().getColor(R.color.Red));
             tabIncome.setTextColor(getResources().getColor(R.color.Gray));
-            // Load expenses data
             Toast.makeText(this, "Hiển thị Chi tiêu", Toast.LENGTH_SHORT).show();
         } else {
             tabIncome.setTextColor(getResources().getColor(R.color.Red));
             tabExpenses.setTextColor(getResources().getColor(R.color.Gray));
-            // Load income data
             Toast.makeText(this, "Hiển thị Thu nhập", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void updateDateRange(String range) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        Calendar calendar = Calendar.getInstance();
-
-        switch (range) {
-            case "day":
-                String today = formatter.format(calendar.getTime());
-                dateRange.setText("Hôm nay: " + today);
-                break;
-
-            case "week":
-                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                String weekStart = formatter.format(calendar.getTime());
-                calendar.add(Calendar.DAY_OF_WEEK, 6);
-                String weekEnd = formatter.format(calendar.getTime());
-                dateRange.setText(weekStart + " - " + weekEnd);
-                break;
-
-            case "month":
-                int month = calendar.get(Calendar.MONTH) + 1;
-                int year = calendar.get(Calendar.YEAR);
-                dateRange.setText(month + "/" + year);
-                break;
-
-            case "year":
-                int currentYear = calendar.get(Calendar.YEAR);
-                dateRange.setText("Năm: " + currentYear);
-                break;
-
-            default:
-                dateRange.setText("Chọn thời gian");
-        }
-    }
-
     private void showDatePicker() {
-        startDate = Calendar.getInstance();
-        endDate = Calendar.getInstance();
+        Calendar startDate = Calendar.getInstance();
+        Calendar endDate = Calendar.getInstance();
 
         DatePickerDialog.OnDateSetListener endDateListener = (view, year, month, dayOfMonth) -> {
             endDate.set(year, month, dayOfMonth);
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             String start = formatter.format(startDate.getTime());
             String end = formatter.format(endDate.getTime());
-            dateRange.setText(start + " - " + end);
+            dashboardViewModel.updateDateRange(start + " - " + end);
         };
 
         DatePickerDialog.OnDateSetListener startDateListener = (view, year, month, dayOfMonth) -> {

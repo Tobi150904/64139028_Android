@@ -16,7 +16,7 @@ public class ThuNhap {
 
     public String tenNguonThu;
     public float soTien;
-    public Date ngayThang; // Sử dụng Date thay vì String
+    public Date ngayThang;
 
     public ThuNhap(String tenNguonThu, float soTien, Date ngayThang) {
         this.tenNguonThu = tenNguonThu;

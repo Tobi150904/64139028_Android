@@ -9,14 +9,13 @@ public class DanhMuc {
     public int id;
 
     public String tenDanhMuc;
-    public String loai; // "Thu nhập" hoặc "Chi tiêu"
+    public String loai;
 
     public DanhMuc(String tenDanhMuc, String loai) {
         this.tenDanhMuc = tenDanhMuc;
         this.loai = loai;
     }
 
-    // Getter và Setter
     public int getId() {
         return id;
     }
