@@ -1,17 +1,20 @@
+// SoDu.java
 package vn.ngoviethoang.duancuoiky.data.entity;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "SoDu")
+@Entity
 public class SoDu {
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private int id = 1;
+    private int balance;
 
-    private double amount;
+    public SoDu() {
+    }
 
-    public SoDu(double amount) {
-        this.amount = amount;
+    public SoDu(int balance) {
+        this.balance = balance;
     }
 
     public int getId() {
@@ -22,11 +25,11 @@ public class SoDu {
         this.id = id;
     }
 
-    public double getAmount() {
-        return amount;
+    public int getBalance() {
+        return balance;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public void setBalance(int balance) {
+        this.balance = balance;
     }
 }

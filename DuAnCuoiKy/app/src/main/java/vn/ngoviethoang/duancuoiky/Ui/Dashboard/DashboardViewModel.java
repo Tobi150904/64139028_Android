@@ -4,9 +4,9 @@ package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -14,7 +14,7 @@ import java.util.Calendar;
 import vn.ngoviethoang.duancuoiky.data.entity.SoDu;
 import vn.ngoviethoang.duancuoiky.data.repository.SoDuRepository;
 
-public class DashboardViewModel extends ViewModel {
+public class DashboardViewModel extends AndroidViewModel {
     private final MutableLiveData<String> dateRange = new MutableLiveData<>();
     private final MutableLiveData<String> tabSelected = new MutableLiveData<>();
 

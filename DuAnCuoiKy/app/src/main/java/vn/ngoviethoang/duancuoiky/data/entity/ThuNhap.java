@@ -24,7 +24,6 @@ public class ThuNhap {
         this.ngayThang = ngayThang;
     }
 
-    // Getter và Setter
     public int getId() {
         return id;
     }
