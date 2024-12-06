@@ -8,7 +8,6 @@
     android:background="@color/White"
     android:padding="16dp">
 
-    <!-- Logo -->
     <ImageView
         android:id="@+id/logoImage"
         android:layout_width="120dp"
@@ -18,15 +17,12 @@
         android:contentDescription="App Logo"
         android:layout_marginBottom="24dp" />
 
-    <!-- Email Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/emailInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Email"
-        android:layout_marginBottom="16dp"
-        app:helperText="Nhập email hợp lệ"
-        app:errorEnabled="true">
+        android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/emailInput"
@@ -38,15 +34,12 @@
             android:focusableInTouchMode="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Password Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/passwordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Mật khẩu"
-        android:layout_marginBottom="16dp"
-        app:helperText="Mật khẩu phải có ít nhất 6 ký tự"
-        app:errorEnabled="true">
+        android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordInput"
@@ -55,15 +48,12 @@
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Confirm Password Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/confirmPasswordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Xác nhận mật khẩu"
-        android:layout_marginBottom="16dp"
-        app:helperText="Mật khẩu phải khớp với mật khẩu đã nhập"
-        app:errorEnabled="true">
+        android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/confirmPasswordInput"
@@ -72,7 +62,6 @@
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Register Button -->
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
@@ -82,7 +71,6 @@
         android:textColor="@color/White"
         android:layout_marginBottom="16dp" />
 
-    <!-- Already have an account -->
     <TextView
         android:id="@+id/loginLink"
         android:layout_width="wrap_content"

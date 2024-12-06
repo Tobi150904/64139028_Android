@@ -26,6 +26,9 @@
         <activity android:name=".Ui.Dashboard.DashboardActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".Ui.AddTransaction.AddTransactionActivity"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>

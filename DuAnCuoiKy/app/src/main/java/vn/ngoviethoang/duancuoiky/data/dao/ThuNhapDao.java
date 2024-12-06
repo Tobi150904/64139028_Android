@@ -7,8 +7,8 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import java.util.Date;
 import java.util.List;
+
 import vn.ngoviethoang.duancuoiky.data.entity.ThuNhap;
 
 @Dao
@@ -23,7 +23,5 @@ public interface ThuNhapDao {
     void deleteThuNhap(ThuNhap thuNhap);
 
     @Query("SELECT * FROM thu_nhap WHERE ngayThang BETWEEN :startDate AND :endDate")
-    LiveData<List<ThuNhap>> getThuNhapByDateRange(Date startDate, Date endDate);
+    LiveData<List<ThuNhap>> getThuNhapByDateRange(long startDate, long endDate);
 }
-
-

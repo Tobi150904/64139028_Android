@@ -7,7 +7,6 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import java.util.Date;
 import java.util.List;
 
 import vn.ngoviethoang.duancuoiky.data.entity.ChiTieu;
@@ -24,8 +23,5 @@ public interface ChiTieuDao {
     void deleteChiTieu(ChiTieu chiTieu);
 
     @Query("SELECT * FROM chi_tieu WHERE ngayThang BETWEEN :startDate AND :endDate")
-    LiveData<List<ChiTieu>> getChiTieuByDateRange(Date startDate, Date endDate);
+    LiveData<List<ChiTieu>> getChiTieuByDateRange(long startDate, long endDate);
 }
-
-
-

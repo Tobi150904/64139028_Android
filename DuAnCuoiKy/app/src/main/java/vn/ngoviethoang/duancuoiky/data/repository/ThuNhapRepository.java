@@ -23,7 +23,9 @@ public class ThuNhapRepository {
     }
 
     public LiveData<List<ThuNhap>> getThuNhapByDateRange(Date startDate, Date endDate) {
-        return thuNhapDao.getThuNhapByDateRange(startDate, endDate);
+        long startTimestamp = startDate.getTime();
+        long endTimestamp = endDate.getTime();
+        return thuNhapDao.getThuNhapByDateRange(startTimestamp, endTimestamp);
     }
 
     public void insertThuNhap(ThuNhap thuNhap) {

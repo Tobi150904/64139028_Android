@@ -23,7 +23,9 @@ public class ChiTieuRepository {
     }
 
     public LiveData<List<ChiTieu>> getChiTieuByDateRange(Date startDate, Date endDate) {
-        return chiTieuDao.getChiTieuByDateRange(startDate, endDate);
+        long startTimestamp = startDate.getTime();
+        long endTimestamp = endDate.getTime();
+        return chiTieuDao.getChiTieuByDateRange(startTimestamp, endTimestamp);
     }
 
     public void insertChiTieu(ChiTieu chiTieu) {
@@ -38,5 +40,3 @@ public class ChiTieuRepository {
         executorService.execute(() -> chiTieuDao.deleteChiTieu(chiTieu));
     }
 }
-
-

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/Green">
+
+            <ImageView
+                android:id="@+id/ic_back"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Back"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="64dp"
+                android:layout_marginTop="20dp"
+                android:text="Thêm tài khoản"
+                android:textColor="@color/White"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/amount"
+                android:layout_width="82dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:hint="0"
+                android:inputType="numberDecimal"
+                android:textColor="@color/Green"
+                android:textSize="24sp"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VND"
+                android:textColor="@color/Green"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên tài khoản"
+                android:textSize="16sp"
+                android:textColor="@color/Gray"
+                android:textStyle="bold"/>
+
+            <EditText
+                android:id="@+id/account_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:hint="Nhập tên tài khoản"
+                android:textSize="14sp"
+                android:textColor="@color/Green" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/category_name"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:text="Biểu tượng"
+            android:textColor="@color/Gray"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:padding="16dp"
+            android:columnOrderPreserved="false"
+            android:useDefaultMargins="true">
+
+            <ImageView
+                android:id="@+id/ic_wallet"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:layout_columnWeight="1"
+                android:contentDescription="Wallet"
+                android:src="@drawable/ic_wallet" />
+
+            <ImageView
+                android:id="@+id/ic_bank"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_columnWeight="1"
+                android:src="@drawable/ic_bank"
+                android:contentDescription="Bank" />
+
+            <ImageView
+                android:id="@+id/ic_credit_card"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_columnWeight="1"
+                android:src="@drawable/ic_credit_card"
+                android:contentDescription="Credit Card" />
+
+            <ImageView
+                android:id="@+id/ic_cash"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_columnWeight="1"
+                android:src="@drawable/ic_cash"
+                android:contentDescription="Cash" />
+
+            <ImageView
+                android:id="@+id/ic_wallet_2"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_columnWeight="1"
+                android:src="@drawable/ic_wallet"
+                android:contentDescription="Wallet" />
+
+            <ImageView
+                android:id="@+id/ic_bank_2"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:layout_columnWeight="1"
+                android:contentDescription="Bank"
+                android:src="@drawable/ic_bank" />
+
+            <ImageView
+                android:id="@+id/ic_credit_card_2"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_columnWeight="1"
+                android:src="@drawable/ic_credit_card"
+                android:contentDescription="Credit Card" />
+
+            <ImageView
+                android:id="@+id/ic_cash_2"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_columnWeight="1"
+                android:src="@drawable/ic_cash"
+                android:contentDescription="Cash" />
+        </GridLayout>
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/button_background"
+            android:text="Thêm"
+            android:textColor="@color/White"
+            android:textSize="16sp" />
+    </LinearLayout>
+</ScrollView>

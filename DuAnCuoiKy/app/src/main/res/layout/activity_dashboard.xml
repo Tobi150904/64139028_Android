@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Header -->
         <RelativeLayout
             android:id="@+id/header"
             android:layout_width="0dp"
@@ -22,7 +21,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Toolbar -->
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -50,7 +48,6 @@
                     android:contentDescription="Transaction List" />
             </androidx.appcompat.widget.Toolbar>
 
-            <!-- Balance Section -->
             <TextView
                 android:id="@+id/total_balance_label"
                 android:layout_width="wrap_content"
@@ -62,18 +59,15 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <EditText
+            <TextView
                 android:id="@+id/total_balance_amount"
-                android:layout_width="wrap_content"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/total_balance_label"
                 android:layout_centerHorizontal="true"
-                android:inputType="numberDecimal"
                 android:textColor="@color/White"
                 android:textSize="24sp"
                 android:textStyle="bold" />
-
-            <!-- Tabs Section -->
 
             <ImageView
                 android:id="@+id/icon_edit_balance"
@@ -121,22 +115,20 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- Body -->
         <LinearLayout
             android:id="@+id/body"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="353dp"
+            android:layout_height="675dp"
             android:layout_marginTop="-50dp"
             android:background="@drawable/card_background"
             android:backgroundTint="@color/White"
             android:elevation="4dp"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/header"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header">
 
-            <!-- Date Tabs -->
             <LinearLayout
                 android:id="@+id/tab_layout"
                 android:layout_width="match_parent"
@@ -200,7 +192,6 @@
                 android:textColor="@color/Gray"
                 android:textSize="14sp" />
 
-            <!-- Pie Chart -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
@@ -218,18 +209,16 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
                     android:layout_margin="16dp"
-                    android:src="@drawable/ic_add"
-                    android:contentDescription="Add Transaction" />
+                    android:contentDescription="Add Transaction"
+                    android:src="@drawable/ic_add" />
             </RelativeLayout>
 
-            <!-- Transaction List -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Repeat for each transaction item -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -239,14 +228,14 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_entertain"
-                        android:contentDescription="Entertain Icon" />
+                        android:contentDescription="Entertain Icon"
+                        android:src="@drawable/ic_entertain" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:text="Giải trí"
                         android:textColor="@color/Black"
                         android:textSize="14sp" />
@@ -261,12 +250,10 @@
             </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/nav_header"
         app:menu="@menu/menu_dashboard" />
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -12,15 +12,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header -->
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:background="@color/Green">
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/Green">
 
             <!-- Back Button -->
             <ImageView
-                android:id="@+id/back_button"
+                android:id="@+id/ic_back"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="16dp"
@@ -28,19 +29,17 @@
                 android:src="@drawable/ic_back"
                 android:contentDescription="Back" />
 
-            <!-- Title -->
             <TextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="64dp"
                 android:text="Thêm giao dịch"
                 android:textColor="@color/White"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!-- Tabs -->
             <LinearLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
@@ -79,13 +78,14 @@
             android:gravity="center"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/amount"
+                android:layout_width="82dp"
                 android:layout_height="wrap_content"
-                android:text="0"
+                android:layout_marginEnd="8dp"
+                android:inputType="numberDecimal"
                 android:textColor="@color/Green"
-                android:textSize="24sp"
-                android:layout_marginEnd="8dp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -102,23 +102,20 @@
                 android:contentDescription="Calculator" />
         </LinearLayout>
 
-        <!-- Tài khoản -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@color/Gray">
+            android:padding="16dp">
 
-            <!-- Tiêu đề -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tài khoản"
                 android:textSize="16sp"
-                android:textColor="@color/Gray"/>
+                android:textColor="@color/Gray"
+                android:textStyle="bold"/>
 
-            <!-- Tên tài khoản -->
             <TextView
                 android:id="@+id/account_name"
                 android:layout_width="wrap_content"
@@ -129,15 +126,15 @@
                 android:textColor="@color/Green" />
         </LinearLayout>
 
-
-        <!-- Danh mục -->
         <TextView
+            android:id="@+id/category_name"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
             android:layout_marginStart="16dp"
             android:text="Danh mục"
             android:textColor="@color/Gray"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
         <GridLayout
             android:layout_width="match_parent"
@@ -145,7 +142,6 @@
             android:columnCount="4"
             android:padding="16dp">
 
-            <!-- Mỗi danh mục -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -153,8 +149,8 @@
                 android:gravity="center">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/Red"
                     android:contentDescription="Health"
@@ -173,11 +169,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginStart="16dp">
+                android:layout_marginStart="24dp">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/Red"
                     android:contentDescription="Entertain"
@@ -196,11 +192,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginStart="16dp">
+                android:layout_marginStart="24dp">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/Red"
                     android:contentDescription="Home"
@@ -219,11 +215,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginStart="16dp">
+                android:layout_marginStart="24dp">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/Red"
                     android:contentDescription="Cafe"
@@ -241,11 +237,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginTop="16dp"
                 android:gravity="center">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/Red"
                     android:contentDescription="Shopping"
@@ -264,11 +261,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginStart="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="24dp">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/Red"
                     android:contentDescription="Travel"
@@ -287,11 +285,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginStart="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="24dp">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/Red"
                     android:contentDescription="Education"
@@ -310,11 +309,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginStart="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="24dp">
 
                 <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/Red"
                     android:contentDescription="Add"
@@ -329,47 +329,48 @@
             </LinearLayout>
         </GridLayout>
 
-        <!-- Date Selector -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:padding="8dp"
             android:gravity="center">
 
             <TextView
+                android:id="@+id/today_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="01/12 hôm nay"
                 android:padding="8dp"
-                android:background="@drawable/date_selected_background"
-                android:textColor="@color/White" />
+                android:text="Hôm nay"
+                android:textColor="@color/Gray"/>
 
             <TextView
+                android:id="@+id/yesterday_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="30/11 hôm qua"
+                android:layout_marginStart="24dp"
                 android:padding="8dp"
-                android:layout_marginStart="8dp"
+                android:text="Hôm qua"
                 android:textColor="@color/Gray" />
 
             <TextView
+                android:id="@+id/two_days_ago_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="27/11 cuối cùng"
+                android:layout_marginStart="24dp"
                 android:padding="8dp"
-                android:layout_marginStart="8dp"
+                android:text="2 ngày trước"
                 android:textColor="@color/Gray" />
 
             <ImageView
+                android:id="@+id/ic_calendar"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="32dp"
                 android:src="@drawable/ic_calendar"
                 android:contentDescription="Calendar" />
         </LinearLayout>
 
-        <!-- Input Fields -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -381,9 +382,11 @@
                 android:layout_height="wrap_content"
                 android:text="Thẻ"
                 android:textSize="14sp"
-                android:textColor="@color/Gray" />
+                android:textColor="@color/Gray"
+                android:textStyle="bold"/>
 
             <Button
+                android:id="@+id/add_card_button"
                 android:layout_width="144dp"
                 android:layout_height="35dp"
                 android:layout_marginTop="8dp"
@@ -396,9 +399,11 @@
                 android:layout_marginTop="8dp"
                 android:text="Ghi chú"
                 android:textSize="14sp"
-                android:textColor="@color/Gray" />
+                android:textColor="@color/Gray"
+                android:textStyle="bold"/>
 
             <EditText
+                android:id="@+id/note_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Ghi chú"
@@ -408,10 +413,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ảnh"
+                android:textSize="14sp"
                 android:textColor="@color/Gray"
+                android:textStyle="bold"
                 android:layout_marginTop="16dp" />
 
-            <!-- Image Add Fields -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -419,6 +425,7 @@
                 android:layout_marginTop="8dp">
 
                 <ImageView
+                    android:id="@+id/ic_add_photo"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:src="@drawable/ic_add_photo"
@@ -427,8 +434,8 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Submit Button -->
         <Button
+            android:id="@+id/save_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"

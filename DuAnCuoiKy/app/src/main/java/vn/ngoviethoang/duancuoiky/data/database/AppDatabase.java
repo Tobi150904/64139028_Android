@@ -12,23 +12,26 @@ import java.util.concurrent.Executors;
 
 import vn.ngoviethoang.duancuoiky.data.dao.ChiTieuDao;
 import vn.ngoviethoang.duancuoiky.data.dao.DanhMucDao;
+import vn.ngoviethoang.duancuoiky.data.dao.GiaoDichDao;
 import vn.ngoviethoang.duancuoiky.data.dao.SoDuDao;
 import vn.ngoviethoang.duancuoiky.data.dao.ThuNhapDao;
 import vn.ngoviethoang.duancuoiky.data.dao.UserDao;
 import vn.ngoviethoang.duancuoiky.data.entity.ChiTieu;
 import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
+import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
 import vn.ngoviethoang.duancuoiky.data.entity.SoDu;
 import vn.ngoviethoang.duancuoiky.data.entity.ThuNhap;
 import vn.ngoviethoang.duancuoiky.data.entity.User;
 
-@Database(entities = {ChiTieu.class, ThuNhap.class, DanhMuc.class, User.class, SoDu.class}, version = 1)
-@TypeConverters(DateConverter.class)
+@Database(entities = {ChiTieu.class, ThuNhap.class, DanhMuc.class, User.class, SoDu.class, GiaoDich.class}, version = 1)
+@TypeConverters({DateConverter.class, Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract ChiTieuDao chiTieuDao();
     public abstract ThuNhapDao thuNhapDao();
     public abstract DanhMucDao danhMucDao();
     public abstract SoDuDao soDuDao();
+    public abstract GiaoDichDao giaoDichDao();
 
     private static volatile AppDatabase INSTANCE;
 
@@ -51,5 +54,3 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 }
-
-
