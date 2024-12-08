@@ -17,17 +17,16 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 
 import vn.ngoviethoang.duancuoiky.R;
-import vn.ngoviethoang.duancuoiky.Ui.AddTransaction.AddTransactionActivity;
-import vn.ngoviethoang.duancuoiky.Ui.TransactionDetail.TransactionDetailActivity;
-import vn.ngoviethoang.duancuoiky.data.entity.SoDu;
+import vn.ngoviethoang.duancuoiky.Ui.Transaction.AddTransactionActivity;
+import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
+import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 
 public class DashboardActivity extends AppCompatActivity {
     private DashboardViewModel dashboardViewModel;
     private TextView totalBalanceAmount, dateRange, tabExpenses, tabIncome, tabDay, tabWeek, tabMonth, tabYear, tabCustom;
-    private ImageView iconMenu, iconList, iconAdd, iconEditBalance;
+    private ImageView iconMenu, iconList, iconAdd, iconAccount, iconEditBalance;
     private DrawerLayout drawerLayout;
 
     @Override
@@ -35,12 +34,12 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // Initialize Views
         totalBalanceAmount = findViewById(R.id.total_balance_amount);
         dateRange = findViewById(R.id.date_range);
         iconMenu = findViewById(R.id.icon_menu);
         iconList = findViewById(R.id.icon_list);
         iconAdd = findViewById(R.id.icon_add_transaction);
+        iconAccount = findViewById(R.id.nav_account);
         iconEditBalance = findViewById(R.id.icon_edit_balance);
         tabExpenses = findViewById(R.id.tab_expenses);
         tabIncome = findViewById(R.id.tab_income);
@@ -51,48 +50,38 @@ public class DashboardActivity extends AppCompatActivity {
         tabCustom = findViewById(R.id.tab_custom);
         drawerLayout = findViewById(R.id.drawer_layout);
 
-        // Initialize ViewModel
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
-
-        // Observe LiveData
         dashboardViewModel.getDateRange().observe(this, dateRange::setText);
-        dashboardViewModel.getBalance().observe(this, soDu -> {
-            if (soDu != null) {
-                totalBalanceAmount.setText(String.valueOf(soDu.getBalance()));
+        dashboardViewModel.getBalance().observe(this, taiKhoan -> {
+            if (taiKhoan != null) {
+                totalBalanceAmount.setText(String.valueOf(taiKhoan.getSodu()));
             }
         });
-//        dashboardViewModel.getItems().observe(this, this::updateItems);
-//        dashboardViewModel.getPieChartData().observe(this, this::updatePieChart);
 
-        // Set click listeners
         iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(findViewById(R.id.nav_view)));
         iconList.setOnClickListener(v -> startActivity(new Intent(this, TransactionDetailActivity.class)));
         iconAdd.setOnClickListener(v -> startActivity(new Intent(this, AddTransactionActivity.class)));
+        icon
         iconEditBalance.setOnClickListener(v -> showEditBalanceDialog());
 
-        // Tab chọn khoảng thời gian
         tabDay.setOnClickListener(v -> dashboardViewModel.updateDateRange("day"));
         tabWeek.setOnClickListener(v -> dashboardViewModel.updateDateRange("week"));
         tabMonth.setOnClickListener(v -> dashboardViewModel.updateDateRange("month"));
         tabYear.setOnClickListener(v -> dashboardViewModel.updateDateRange("year"));
         tabCustom.setOnClickListener(v -> showDatePickerDialog());
 
-        // Tab chi phí và thu nhập
         tabExpenses.setOnClickListener(v -> selectTab(tabExpenses, "expenses"));
         tabIncome.setOnClickListener(v -> selectTab(tabIncome, "income"));
     }
 
     private void selectTab(TextView selectedTab, String tab) {
-        // Reset all tabs
         resetTab(tabExpenses);
         resetTab(tabIncome);
 
-        // Highlight selected tab
         selectedTab.setTextColor(getResources().getColor(R.color.Green));
         selectedTab.setTypeface(null, Typeface.BOLD);
         selectedTab.setPaintFlags(selectedTab.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
-        // Switch tab in ViewModel
         dashboardViewModel.switchTab(tab);
     }
 
@@ -102,16 +91,7 @@ public class DashboardActivity extends AppCompatActivity {
         tab.setPaintFlags(tab.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
     }
 
-//    private void updateItems(List<Item> items) {
-//        // Update the items in the UI
-//    }
-//
-//    private void updatePieChart(PieChartData pieChartData) {
-//        // Update the pie chart in the UI
-//    }
-
     private void showEditBalanceDialog() {
-        // Hiển thị dialog chỉnh sửa số dư
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_edit_balance);
 
@@ -126,10 +106,10 @@ public class DashboardActivity extends AppCompatActivity {
 
         btnSave.setOnClickListener(v -> {
             try {
-                int newBalance = Integer.parseInt(editBalance.getText().toString());
-                SoDu soDu = new SoDu(newBalance);
-                dashboardViewModel.updateBalance(soDu);
-                totalBalanceAmount.setText(String.valueOf(newBalance)); // Cập nhật TextView
+                double newBalance = Double.parseDouble(editBalance.getText().toString());
+                TaiKhoan taiKhoan = new TaiKhoan("Tài khoản chính", newBalance, R.drawable.ic_account1);
+                dashboardViewModel.updateBalance(taiKhoan);
+                totalBalanceAmount.setText(String.valueOf(newBalance));
 
                 Toast.makeText(this, "Số dư đã được cập nhật!", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
@@ -142,7 +122,6 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void showDatePickerDialog() {
-        // Hiển thị dialog chọn khoảng thời gian
         Calendar startDate = Calendar.getInstance();
         Calendar endDate = Calendar.getInstance();
 

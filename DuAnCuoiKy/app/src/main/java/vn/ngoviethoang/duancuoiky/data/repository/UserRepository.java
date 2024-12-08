@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import vn.ngoviethoang.duancuoiky.data.dao.UserDao;
 import vn.ngoviethoang.duancuoiky.data.database.AppDatabase;
@@ -15,14 +14,13 @@ public class UserRepository {
     private final UserDao userDao;
     private final ExecutorService executorService;
 
-    // Constructor khởi tạo UserRepository
     public UserRepository(Context context) {
         AppDatabase database = AppDatabase.getDatabase(context);
         userDao = database.userDao();
-        executorService = Executors.newSingleThreadExecutor();
+        executorService = AppDatabase.databaseWriteExecutor; // Sử dụng executor chung
     }
 
-    // Thêm người dùng mới vào cơ sở dữ liệu (Đăng ký)
+    // Thêm người dùng mới với callback xử lý kết quả
     public void registerUser(User user, RepositoryCallback callback) {
         executorService.execute(() -> {
             try {
@@ -39,7 +37,7 @@ public class UserRepository {
         return userDao.getUserByEmailAndPassword(email, password);
     }
 
-    // Kiểm tra người dùng đã tồn tại hay chưa
+    // Kiểm tra người dùng đã tồn tại
     public LiveData<User> checkUserExists(String email) {
         return userDao.getUserByEmail(email);
     }

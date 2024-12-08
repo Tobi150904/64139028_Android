@@ -13,7 +13,11 @@ public interface DanhMucDao {
     @Insert
     void insertDanhMuc(DanhMuc danhMuc);
 
+    @Query("SELECT * FROM danh_muc WHERE loai = :loai")
+    LiveData<List<DanhMuc>> getDanhMucByLoai(String loai);
+
     @Query("SELECT * FROM danh_muc")
     LiveData<List<DanhMuc>> getAllDanhMuc();
 }
+
 

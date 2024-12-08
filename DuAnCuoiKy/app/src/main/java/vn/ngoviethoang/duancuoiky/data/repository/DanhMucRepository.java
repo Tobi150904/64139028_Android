@@ -12,20 +12,19 @@ import vn.ngoviethoang.duancuoiky.data.database.AppDatabase;
 import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
 
 public class DanhMucRepository {
-    private DanhMucDao danhMucDao;
-    private ExecutorService executorService;
+    private final DanhMucDao danhMucDao;
 
     public DanhMucRepository(Context context) {
         AppDatabase database = AppDatabase.getDatabase(context);
-        danhMucDao = database.danhMucDao();
-        executorService = Executors.newSingleThreadExecutor();
+        this.danhMucDao = database.danhMucDao();
     }
 
-    public LiveData<List<DanhMuc>> getAllDanhMuc() {
-        return danhMucDao.getAllDanhMuc();
+    public LiveData<List<DanhMuc>> getDanhMucByLoai(String loai) {
+        return danhMucDao.getDanhMucByLoai(loai);
     }
 
     public void insertDanhMuc(DanhMuc danhMuc) {
-        executorService.execute(() -> danhMucDao.insertDanhMuc(danhMuc));
+        AppDatabase.databaseWriteExecutor.execute(() -> danhMucDao.insertDanhMuc(danhMuc));
     }
 }
+

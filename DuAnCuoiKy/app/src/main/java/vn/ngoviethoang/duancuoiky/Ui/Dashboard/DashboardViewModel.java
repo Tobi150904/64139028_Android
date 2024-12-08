@@ -1,7 +1,7 @@
+// DashboardViewModel.java
 package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 
 import android.app.Application;
-import android.content.ClipData;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -12,31 +12,36 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
-import vn.ngoviethoang.duancuoiky.Ui.Components.PieChartComponent;
-import vn.ngoviethoang.duancuoiky.data.entity.SoDu;
-import vn.ngoviethoang.duancuoiky.data.repository.SoDuRepository;
+import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
+import vn.ngoviethoang.duancuoiky.data.repository.TaiKhoanRepository;
 
 public class DashboardViewModel extends AndroidViewModel {
     private final MutableLiveData<String> dateRange = new MutableLiveData<>();
     private final MutableLiveData<String> tabSelected = new MutableLiveData<>();
-    private final MutableLiveData<List<ClipData.Item>> items = new MutableLiveData<>();
-    private final MutableLiveData<PieChartComponent> pieChartData = new MutableLiveData<>();
+    private final MutableLiveData<List<TaiKhoan>> accounts = new MutableLiveData<>();
 
-    private final SoDuRepository soDuRepository;
-    private final LiveData<SoDu> balance;
+    private final TaiKhoanRepository taiKhoanRepository;
+    private final LiveData<List<TaiKhoan>> allAccounts;
+    private final MutableLiveData<TaiKhoan> balance = new MutableLiveData<>();
 
     public DashboardViewModel(@NonNull Application application) {
         super(application);
-        soDuRepository = new SoDuRepository(application);
-        balance = soDuRepository.getBalance();
+        taiKhoanRepository = new TaiKhoanRepository(application);
+        allAccounts = taiKhoanRepository.getAllTaiKhoan();
+        allAccounts.observeForever(accounts -> {
+            this.accounts.setValue(accounts);
+            if (accounts != null && !accounts.isEmpty()) {
+                balance.setValue(accounts.get(0)); // Assuming the first account is the main account
+            }
+        });
     }
 
-    public LiveData<SoDu> getBalance() {
+    public LiveData<TaiKhoan> getBalance() {
         return balance;
     }
 
-    public void updateBalance(SoDu soDu) {
-        soDuRepository.updateBalance(soDu);
+    public void updateBalance(TaiKhoan taiKhoan) {
+        taiKhoanRepository.updateTaiKhoan(taiKhoan);
     }
 
     public LiveData<String> getDateRange() {
@@ -47,12 +52,8 @@ public class DashboardViewModel extends AndroidViewModel {
         return tabSelected;
     }
 
-    public LiveData<List<ClipData.Item>> getItems() {
-        return items;
-    }
-
-    public LiveData<PieChartComponent> getPieChartData() {
-        return pieChartData;
+    public LiveData<List<TaiKhoan>> getAccounts() {
+        return accounts;
     }
 
     public void updateDateRange(String range) {
@@ -95,14 +96,5 @@ public class DashboardViewModel extends AndroidViewModel {
 
     public void switchTab(String tab) {
         tabSelected.setValue(tab);
-//        updateDataForTab(tab);
     }
-
-//    private void updateDataForTab(String tab) {
-//        // Fetch and update items and pie chart data based on the selected tab
-//        List<ClipData.Item> updatedItems = soDuRepository.getItemsForTab(tab);
-//        PieChartComponent updatedPieChartData = soDuRepository.getPieChartDataForTab(tab);
-//        items.setValue(updatedItems);
-//        pieChartData.setValue(updatedPieChartData);
-//    }
 }

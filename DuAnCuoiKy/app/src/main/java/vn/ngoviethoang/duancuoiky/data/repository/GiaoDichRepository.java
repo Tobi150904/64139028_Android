@@ -4,40 +4,29 @@ import android.content.Context;
 
 import androidx.lifecycle.LiveData;
 
+import java.util.List;
+
+import vn.ngoviethoang.duancuoiky.data.dao.GiaoDichDao;
 import vn.ngoviethoang.duancuoiky.data.database.AppDatabase;
 import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
 
 public class GiaoDichRepository {
-    private final AppDatabase database;
+    private final GiaoDichDao giaoDichDao;
 
     public GiaoDichRepository(Context context) {
-        this.database = AppDatabase.getDatabase(context);
+        AppDatabase database = AppDatabase.getDatabase(context);
+        this.giaoDichDao = database.giaoDichDao();
     }
 
-    public void insertGiaoDich(GiaoDich giaoDich, RepositoryCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            try {
-                database.giaoDichDao().insert (giaoDich);
-                callback.onSuccess();
-            } catch (Exception e) {
-                callback.onFailure(e.getMessage());
-            }
-        });
+    public LiveData<List<GiaoDich>> getGiaoDichByLoai(String loai) {
+        return giaoDichDao.getGiaoDichByLoai(loai);
     }
 
-    public void updateGiaoDich(GiaoDich giaoDich, RepositoryCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            try {
-                database.giaoDichDao().update(giaoDich);
-                callback.onSuccess();
-            } catch (Exception e) {
-                callback.onFailure(e.getMessage());
-            }
-        });
+    public void insertGiaoDich(GiaoDich giaoDich) {
+        AppDatabase.databaseWriteExecutor.execute(() -> giaoDichDao.insertGiaoDich(giaoDich));
     }
 
-    public interface RepositoryCallback {
-        void onSuccess();
-        void onFailure(String error);
+    public void deleteGiaoDich(GiaoDich giaoDich) {
+        AppDatabase.databaseWriteExecutor.execute(() -> giaoDichDao.deleteGiaoDich(giaoDich));
     }
 }

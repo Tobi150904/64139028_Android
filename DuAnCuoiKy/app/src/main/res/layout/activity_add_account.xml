@@ -98,6 +98,7 @@
             android:textStyle="bold"/>
 
         <GridLayout
+            android:id="@+id/account_icons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="4"
@@ -106,68 +107,60 @@
             android:useDefaultMargins="true">
 
             <ImageView
-                android:id="@+id/ic_wallet"
-                android:layout_width="wrap_content"
+                android:id="@+id/ic_account1"
+                android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_columnWeight="1"
-                android:contentDescription="Wallet"
-                android:src="@drawable/ic_wallet" />
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_account1" />
 
             <ImageView
-                android:id="@+id/ic_bank"
-                android:layout_width="0dp"
+                android:id="@+id/ic_account2"
+                android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_columnWeight="1"
-                android:src="@drawable/ic_bank"
-                android:contentDescription="Bank" />
+                android:layout_marginStart="24dp"
+                android:src="@drawable/ic_account2" />
 
             <ImageView
-                android:id="@+id/ic_credit_card"
-                android:layout_width="0dp"
+                android:id="@+id/ic_account3"
+                android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_columnWeight="1"
-                android:src="@drawable/ic_credit_card"
-                android:contentDescription="Credit Card" />
+                android:layout_marginStart="24dp"
+                android:src="@drawable/ic_account3" />
 
             <ImageView
-                android:id="@+id/ic_cash"
-                android:layout_width="0dp"
+                android:id="@+id/ic_account4"
+                android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_columnWeight="1"
-                android:src="@drawable/ic_cash"
-                android:contentDescription="Cash" />
+                android:layout_marginStart="24dp"
+                android:src="@drawable/ic_account4" />
 
             <ImageView
                 android:id="@+id/ic_wallet_2"
-                android:layout_width="0dp"
+                android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_columnWeight="1"
-                android:src="@drawable/ic_wallet"
-                android:contentDescription="Wallet" />
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_account5" />
 
             <ImageView
                 android:id="@+id/ic_bank_2"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_columnWeight="1"
-                android:contentDescription="Bank"
-                android:src="@drawable/ic_bank" />
+                android:layout_marginStart="24dp"
+                android:src="@drawable/ic_account6" />
 
             <ImageView
                 android:id="@+id/ic_credit_card_2"
-                android:layout_width="0dp"
+                android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_columnWeight="1"
-                android:src="@drawable/ic_credit_card"
-                android:contentDescription="Credit Card" />
+                android:layout_marginStart="24dp"
+                android:src="@drawable/ic_account7" />
 
             <ImageView
                 android:id="@+id/ic_cash_2"
-                android:layout_width="0dp"
+                android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_columnWeight="1"
-                android:src="@drawable/ic_cash"
-                android:contentDescription="Cash" />
+                android:layout_marginStart="24dp"
+                android:src="@drawable/ic_account8" />
         </GridLayout>
 
         <Button

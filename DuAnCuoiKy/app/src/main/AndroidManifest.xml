@@ -26,9 +26,19 @@
         <activity android:name=".Ui.Dashboard.DashboardActivity"
             android:exported="true">
         </activity>
-        <activity android:name=".Ui.AddTransaction.AddTransactionActivity"
+        <activity android:name=".Ui.Transaction.AddTransactionActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".Ui.Transaction.TransactionDetailActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".Ui.Account.AddAccountActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".Ui.Account.AccountActivity"
+            android:exported="true">
+        </activity>
+
     </application>
 
 </manifest>
