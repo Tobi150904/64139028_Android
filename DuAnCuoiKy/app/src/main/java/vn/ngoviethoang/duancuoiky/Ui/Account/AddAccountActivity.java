@@ -1,5 +1,7 @@
+// AddAccountActivity.java
 package vn.ngoviethoang.duancuoiky.Ui.Account;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,7 +18,8 @@ import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 public class AddAccountActivity extends AppCompatActivity {
     private AccountViewModel viewModel;
     private EditText accountNameEditText, amountEditText;
-    private int selectedIconResId = R.drawable.ic_account1;
+    private int selectedIconResId = -1;
+    private ImageView selectedIconView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +40,8 @@ public class AddAccountActivity extends AppCompatActivity {
             String accountName = accountNameEditText.getText().toString().trim();
             String amountString = amountEditText.getText().toString().trim();
 
-            if (accountName.isEmpty() || amountString.isEmpty()) {
-                Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            if (accountName.isEmpty() || amountString.isEmpty() || selectedIconResId == -1) {
+                Toast.makeText(this, "Vui lòng điền đầy đủ thông tin và chọn biểu tượng", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -46,13 +49,26 @@ public class AddAccountActivity extends AppCompatActivity {
             TaiKhoan account = new TaiKhoan(accountName, amount, selectedIconResId);
             viewModel.addAccount(account);
             Toast.makeText(this, "Thêm tài khoản thành công", Toast.LENGTH_SHORT).show();
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("accountName", accountName);
+            resultIntent.putExtra("amount", amount);
+            resultIntent.putExtra("iconResId", selectedIconResId);
+            setResult(RESULT_OK, resultIntent);
             finish();
         });
 
-        // Set click listeners for icons
         for (int i = 0; i < iconGrid.getChildCount(); i++) {
             ImageView icon = (ImageView) iconGrid.getChildAt(i);
-            icon.setOnClickListener(v -> selectedIconResId = (int) v.getTag());
+            icon.setTag(icon.getId());
+            icon.setOnClickListener(v -> {
+                if (selectedIconView != null) {
+                    selectedIconView.setBackgroundResource(0);
+                }
+                selectedIconResId = (int) v.getTag();
+                selectedIconView = (ImageView) v;
+                selectedIconView.setBackgroundResource(R.drawable.selected_icon); // Highlight selected icon
+            });
         }
     }
 }

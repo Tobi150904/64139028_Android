@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragment1"
+    android:background="@color/gray">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="CHÀO MỪNG BẠN\nĐẾN VỚI\nCHỨC NĂNG 1\n(CN1)"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+</FrameLayout>

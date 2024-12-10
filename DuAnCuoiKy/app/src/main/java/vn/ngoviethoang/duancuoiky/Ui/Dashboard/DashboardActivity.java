@@ -1,3 +1,4 @@
+// DashboardActivity.java
 package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 
 import android.app.DatePickerDialog;
@@ -15,10 +16,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.navigation.NavigationView;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import vn.ngoviethoang.duancuoiky.R;
+import vn.ngoviethoang.duancuoiky.Ui.Account.AccountActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.AddTransactionActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
@@ -26,8 +30,9 @@ import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 public class DashboardActivity extends AppCompatActivity {
     private DashboardViewModel dashboardViewModel;
     private TextView totalBalanceAmount, dateRange, tabExpenses, tabIncome, tabDay, tabWeek, tabMonth, tabYear, tabCustom;
-    private ImageView iconMenu, iconList, iconAdd, iconAccount, iconEditBalance;
+    private ImageView iconMenu, iconList, iconAdd, iconEditBalance;
     private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +44,6 @@ public class DashboardActivity extends AppCompatActivity {
         iconMenu = findViewById(R.id.icon_menu);
         iconList = findViewById(R.id.icon_list);
         iconAdd = findViewById(R.id.icon_add_transaction);
-        iconAccount = findViewById(R.id.nav_account);
         iconEditBalance = findViewById(R.id.icon_edit_balance);
         tabExpenses = findViewById(R.id.tab_expenses);
         tabIncome = findViewById(R.id.tab_income);
@@ -49,6 +53,7 @@ public class DashboardActivity extends AppCompatActivity {
         tabYear = findViewById(R.id.tab_year);
         tabCustom = findViewById(R.id.tab_custom);
         drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         dashboardViewModel.getDateRange().observe(this, dateRange::setText);
@@ -58,10 +63,9 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(findViewById(R.id.nav_view)));
+        iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(navigationView));
         iconList.setOnClickListener(v -> startActivity(new Intent(this, TransactionDetailActivity.class)));
         iconAdd.setOnClickListener(v -> startActivity(new Intent(this, AddTransactionActivity.class)));
-        icon
         iconEditBalance.setOnClickListener(v -> showEditBalanceDialog());
 
         tabDay.setOnClickListener(v -> dashboardViewModel.updateDateRange("day"));
@@ -72,13 +76,37 @@ public class DashboardActivity extends AppCompatActivity {
 
         tabExpenses.setOnClickListener(v -> selectTab(tabExpenses, "expenses"));
         tabIncome.setOnClickListener(v -> selectTab(tabIncome, "income"));
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.nav_dashboard) {
+                startActivity(new Intent(this, DashboardActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.nav_account) {
+                startActivity(new Intent(this, AccountActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.nav_chart) {
+                startActivity(new Intent(this, TransactionDetailActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.nav_category) {
+                startActivity(new Intent(this, TransactionDetailActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.nav_settings) {
+                startActivity(new Intent(this, TransactionDetailActivity.class));
+                return true;
+            }
+            return false;
+        });
     }
 
     private void selectTab(TextView selectedTab, String tab) {
         resetTab(tabExpenses);
         resetTab(tabIncome);
 
-        selectedTab.setTextColor(getResources().getColor(R.color.Green));
+        selectedTab.setTextColor(getResources().getColor(R.color.Red));
         selectedTab.setTypeface(null, Typeface.BOLD);
         selectedTab.setPaintFlags(selectedTab.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
