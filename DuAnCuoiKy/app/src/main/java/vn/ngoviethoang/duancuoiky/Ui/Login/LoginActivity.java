@@ -37,10 +37,7 @@ public class LoginActivity extends AppCompatActivity {
 
         userRepository = new UserRepository(this);
 
-        // Xử lý sự kiện nhấn nút Đăng nhập
         loginButton.setOnClickListener(v -> loginUser());
-
-        // Xử lý sự kiện nhấn vào liên kết "Đăng ký"
         registerLink.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
@@ -68,13 +65,20 @@ public class LoginActivity extends AppCompatActivity {
             passwordInputLayout.setError(null);
         }
 
-        userRepository.loginUser(email, password).observe(this, user -> {
-            if (user != null) {
-                Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                startActivity(intent);
-                finish();
+        userRepository.checkUserExists(email).observe(this, existingUser -> {
+            if (existingUser == null) {
+                Toast.makeText(LoginActivity.this, "Tài khoản chưa được đăng ký", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(LoginActivity.this, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                userRepository.loginUser(email, password).observe(this, user -> {
+                    if (user != null) {
+                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                        intent.putExtra("USER_ID", user.getId());
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Mật khẩu sai", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }

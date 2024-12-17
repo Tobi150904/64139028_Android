@@ -1,7 +1,7 @@
-// AddAccountActivity.java
 package vn.ngoviethoang.duancuoiky.Ui.Account;
 
-import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,13 +12,15 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.io.ByteArrayOutputStream;
+
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 
 public class AddAccountActivity extends AppCompatActivity {
     private AccountViewModel viewModel;
     private EditText accountNameEditText, amountEditText;
-    private int selectedIconResId = -1;
+    private Bitmap selectedIconBitmap = null;
     private ImageView selectedIconView = null;
 
     @Override
@@ -40,32 +42,32 @@ public class AddAccountActivity extends AppCompatActivity {
             String accountName = accountNameEditText.getText().toString().trim();
             String amountString = amountEditText.getText().toString().trim();
 
-            if (accountName.isEmpty() || amountString.isEmpty() || selectedIconResId == -1) {
+            if (accountName.isEmpty() || amountString.isEmpty() || selectedIconBitmap == null) {
                 Toast.makeText(this, "Vui lòng điền đầy đủ thông tin và chọn biểu tượng", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            int amount = Integer.parseInt(amountString);
-            TaiKhoan account = new TaiKhoan(accountName, amount, selectedIconResId);
-            viewModel.addAccount(account);
-            Toast.makeText(this, "Thêm tài khoản thành công", Toast.LENGTH_SHORT).show();
+            double amount = Double.parseDouble(amountString);
 
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("accountName", accountName);
-            resultIntent.putExtra("amount", amount);
-            resultIntent.putExtra("iconResId", selectedIconResId);
-            setResult(RESULT_OK, resultIntent);
+            // Chuyển bitmap thành byte array
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            selectedIconBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            byte[] iconBytes = outputStream.toByteArray();
+
+            TaiKhoan newAccount = new TaiKhoan(accountName, amount, iconBytes);
+            viewModel.addAccount(newAccount);
+
+            Toast.makeText(this, "Tài khoản đã được thêm!", Toast.LENGTH_SHORT).show();
             finish();
         });
 
         for (int i = 0; i < iconGrid.getChildCount(); i++) {
             ImageView icon = (ImageView) iconGrid.getChildAt(i);
-            icon.setTag(icon.getId());
             icon.setOnClickListener(v -> {
                 if (selectedIconView != null) {
                     selectedIconView.setBackgroundResource(0);
                 }
-                selectedIconResId = (int) v.getTag();
+                selectedIconBitmap = ((BitmapDrawable) icon.getDrawable()).getBitmap();
                 selectedIconView = (ImageView) v;
                 selectedIconView.setBackgroundResource(R.drawable.selected_icon); // Highlight selected icon
             });

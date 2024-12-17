@@ -17,10 +17,9 @@ public class UserRepository {
     public UserRepository(Context context) {
         AppDatabase database = AppDatabase.getDatabase(context);
         userDao = database.userDao();
-        executorService = AppDatabase.databaseWriteExecutor; // Sử dụng executor chung
+        executorService = AppDatabase.databaseWriteExecutor;
     }
 
-    // Thêm người dùng mới với callback xử lý kết quả
     public void registerUser(User user, RepositoryCallback callback) {
         executorService.execute(() -> {
             try {
@@ -32,17 +31,14 @@ public class UserRepository {
         });
     }
 
-    // Kiểm tra thông tin đăng nhập
     public LiveData<User> loginUser(String email, String password) {
         return userDao.getUserByEmailAndPassword(email, password);
     }
 
-    // Kiểm tra người dùng đã tồn tại
     public LiveData<User> checkUserExists(String email) {
         return userDao.getUserByEmail(email);
     }
 
-    // Callback để xử lý kết quả bất đồng bộ
     public interface RepositoryCallback {
         void onSuccess(String message);
         void onFailure(String errorMessage);

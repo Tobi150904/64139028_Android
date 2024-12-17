@@ -26,8 +26,6 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         return new MyViewHolder(view);
     }
 
-
-
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.imageView.setImageResource(img.get(position));

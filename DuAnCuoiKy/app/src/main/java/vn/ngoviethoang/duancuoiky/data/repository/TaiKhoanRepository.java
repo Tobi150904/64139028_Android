@@ -1,6 +1,7 @@
 package vn.ngoviethoang.duancuoiky.data.repository;
 
-import android.content.Context;
+import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
@@ -12,9 +13,9 @@ import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 public class TaiKhoanRepository {
     private final TaiKhoanDao taiKhoanDao;
 
-    public TaiKhoanRepository(Context context) {
-        AppDatabase database = AppDatabase.getDatabase(context);
-        this.taiKhoanDao = database.taiKhoanDao();
+    public TaiKhoanRepository(Application application) {
+        AppDatabase db = AppDatabase.getDatabase(application);
+        taiKhoanDao = db.taiKhoanDao();
     }
 
     public LiveData<List<TaiKhoan>> getAllTaiKhoan() {
@@ -27,5 +28,9 @@ public class TaiKhoanRepository {
 
     public void updateTaiKhoan(TaiKhoan taiKhoan) {
         AppDatabase.databaseWriteExecutor.execute(() -> taiKhoanDao.updateTaiKhoan(taiKhoan));
+    }
+
+    public LiveData<TaiKhoan> getTaiKhoanById(int id) {
+        return taiKhoanDao.getTaiKhoanById(id);
     }
 }

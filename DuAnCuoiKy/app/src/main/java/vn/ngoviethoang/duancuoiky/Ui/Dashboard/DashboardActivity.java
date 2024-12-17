@@ -1,14 +1,17 @@
-// DashboardActivity.java
 package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -26,6 +30,7 @@ import vn.ngoviethoang.duancuoiky.Ui.Account.AccountActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.AddTransactionActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
+import vn.ngoviethoang.duancuoiky.data.repository.TaiKhoanRepository;
 
 public class DashboardActivity extends AppCompatActivity {
     private DashboardViewModel dashboardViewModel;
@@ -33,6 +38,8 @@ public class DashboardActivity extends AppCompatActivity {
     private ImageView iconMenu, iconList, iconAdd, iconEditBalance;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private TaiKhoanRepository taiKhoanRepository;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +62,12 @@ public class DashboardActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
 
+        taiKhoanRepository = new TaiKhoanRepository(getApplication());
+        userId = getIntent().getIntExtra("USER_ID", -1);
+
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         dashboardViewModel.getDateRange().observe(this, dateRange::setText);
-        dashboardViewModel.getBalance().observe(this, taiKhoan -> {
-            if (taiKhoan != null) {
-                totalBalanceAmount.setText(String.valueOf(taiKhoan.getSodu()));
-            }
-        });
+        dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,d VND", balance)));
 
         iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(navigationView));
         iconList.setOnClickListener(v -> startActivity(new Intent(this, TransactionDetailActivity.class)));
@@ -98,8 +104,12 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, TransactionDetailActivity.class));
                 return true;
             }
+            drawerLayout.closeDrawer(navigationView);
             return false;
         });
+
+        // Initialize dashboard
+        dashboardViewModel.initializeDashboard();
     }
 
     private void selectTab(TextView selectedTab, String tab) {
@@ -119,6 +129,54 @@ public class DashboardActivity extends AppCompatActivity {
         tab.setPaintFlags(tab.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
     }
 
+    private void showAccountsDialog() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_accounts);
+
+        LinearLayout accountsContainer = dialog.findViewById(R.id.accounts_container);
+
+        dashboardViewModel.getAccounts().observe(this, accounts -> {
+            accountsContainer.removeAllViews();
+            for (TaiKhoan account : accounts) {
+                LinearLayout accountLayout = new LinearLayout(this);
+                accountLayout.setOrientation(LinearLayout.HORIZONTAL);
+                accountLayout.setPadding(10, 10, 10, 10);
+                accountLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                ));
+
+                ImageView accountIcon = new ImageView(this);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(account.getIcon(), 0, account.getIcon().length);
+                accountIcon.setImageBitmap(bitmap);
+                LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(64, 64); // Adjust size
+                iconParams.setMargins(0, 0, 16, 0); // Add margin to the right
+                accountIcon.setLayoutParams(iconParams);
+                accountIcon.setContentDescription("Account Icon");
+
+                TextView accountName = new TextView(this);
+                accountName.setText(account.getTen());
+                accountName.setTextSize(16); // Adjust text size
+                accountName.setTextColor(getResources().getColor(R.color.Black));
+                accountName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                accountName.setPadding(8, 0, 0, 0);
+
+                accountLayout.addView(accountIcon);
+                accountLayout.addView(accountName);
+
+                accountLayout.setOnClickListener(v -> {
+                    totalBalanceAmount.setText(account.getTen());
+                    iconEditBalance.setVisibility(View.VISIBLE);
+                    dialog.dismiss();
+                });
+
+                accountsContainer.addView(accountLayout);
+            }
+        });
+
+        dialog.show();
+    }
+
     private void showEditBalanceDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_edit_balance);
@@ -135,7 +193,14 @@ public class DashboardActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> {
             try {
                 double newBalance = Double.parseDouble(editBalance.getText().toString());
-                TaiKhoan taiKhoan = new TaiKhoan("Tài khoản chính", newBalance, R.drawable.ic_account1);
+
+                // Chuyển Id thành byte array
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_account1);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                byte[] iconBytes = outputStream.toByteArray();
+
+                TaiKhoan taiKhoan = new TaiKhoan("Tài khoản chính", newBalance, iconBytes);
                 dashboardViewModel.updateBalance(taiKhoan);
                 totalBalanceAmount.setText(String.valueOf(newBalance));
 

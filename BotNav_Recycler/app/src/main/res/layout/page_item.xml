@@ -9,11 +9,11 @@
         android:layout_width="223dp"
         android:layout_height="111dp"
         android:background="@drawable/card_view"
-
         android:gravity="center"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

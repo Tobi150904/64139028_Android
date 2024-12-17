@@ -19,29 +19,18 @@ public class DashboardViewModel extends AndroidViewModel {
     private final MutableLiveData<String> dateRange = new MutableLiveData<>();
     private final MutableLiveData<String> tabSelected = new MutableLiveData<>();
     private final MutableLiveData<List<TaiKhoan>> accounts = new MutableLiveData<>();
+    private final MutableLiveData<Integer> totalBalance = new MutableLiveData<>();
 
     private final TaiKhoanRepository taiKhoanRepository;
-    private final LiveData<List<TaiKhoan>> allAccounts;
-    private final MutableLiveData<TaiKhoan> balance = new MutableLiveData<>();
 
     public DashboardViewModel(@NonNull Application application) {
         super(application);
         taiKhoanRepository = new TaiKhoanRepository(application);
-        allAccounts = taiKhoanRepository.getAllTaiKhoan();
-        allAccounts.observeForever(accounts -> {
-            this.accounts.setValue(accounts);
-            if (accounts != null && !accounts.isEmpty()) {
-                balance.setValue(accounts.get(0)); // Assuming the first account is the main account
-            }
-        });
+        loadAccounts();
     }
 
-    public LiveData<TaiKhoan> getBalance() {
-        return balance;
-    }
-
-    public void updateBalance(TaiKhoan taiKhoan) {
-        taiKhoanRepository.updateTaiKhoan(taiKhoan);
+    public LiveData<Integer> getTotalBalance() {
+        return totalBalance;
     }
 
     public LiveData<String> getDateRange() {
@@ -96,5 +85,26 @@ public class DashboardViewModel extends AndroidViewModel {
 
     public void switchTab(String tab) {
         tabSelected.setValue(tab);
+    }
+
+    public void initializeDashboard() {
+        updateDateRange("day");
+        switchTab("income");
+    }
+
+    public void loadAccounts() {
+        taiKhoanRepository.getAllTaiKhoan().observeForever(accounts -> {
+            this.accounts.setValue(accounts);
+            int total = 0;
+            for (TaiKhoan account : accounts) {
+                total += account.getSodu();
+            }
+            totalBalance.setValue(total);
+        });
+    }
+
+    public void updateBalance(TaiKhoan taiKhoan) {
+        taiKhoanRepository.updateTaiKhoan(taiKhoan);
+        loadAccounts();
     }
 }

@@ -38,10 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         userRepository = new UserRepository(this);
 
-        // Xử lý sự kiện nhấn nút Đăng ký
         registerButton.setOnClickListener(v -> registerUser());
-
-        // Xử lý sự kiện nhấn vào liên kết "Đăng nhập"
         loginLink.setOnClickListener(v -> finish());
     }
 
@@ -74,7 +71,6 @@ public class RegisterActivity extends AppCompatActivity {
             confirmPasswordInputLayout.setError(null);
         }
 
-        // Kiểm tra email đã tồn tại
         userRepository.checkUserExists(email).observe(this, existingUser -> {
             if (existingUser != null) {
                 emailInputLayout.setError("Email đã được sử dụng");
@@ -88,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onSuccess(String message) {
                         runOnUiThread(() -> {
                             Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-                            finish(); // Quay lại màn hình đăng nhập
+                            finish();
                         });
                     }
 

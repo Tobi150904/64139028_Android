@@ -11,7 +11,7 @@
     <item android:title="Menu">
         <menu>
             <item
-                android:id="@+id/nav_home"
+                android:id="@+id/nav_dashboard"
                 android:icon="@drawable/ic_dashboard"
                 android:title="Trang chủ" />
             <item

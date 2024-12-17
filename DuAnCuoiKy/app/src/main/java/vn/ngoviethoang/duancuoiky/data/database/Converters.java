@@ -19,4 +19,10 @@ public class Converters {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         return outputStream.toByteArray();
     }
+
+    @TypeConverter
+    public static Bitmap toBitmap(byte[] byteArray) {
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+    }
+
 }

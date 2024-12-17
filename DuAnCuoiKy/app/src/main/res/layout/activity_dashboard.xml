@@ -59,15 +59,27 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <ImageView
+                android:id="@+id/icon_down"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_below="@id/total_balance_amount"
+                android:layout_marginStart="-27dp"
+                android:layout_marginTop="-66dp"
+                android:layout_toEndOf="@id/total_balance_amount"
+                android:contentDescription="Show Accounts"
+                android:src="@drawable/ic_down" />
+
             <TextView
                 android:id="@+id/total_balance_amount"
-                android:layout_width="60dp"
+                android:layout_width="139dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/total_balance_label"
                 android:layout_centerHorizontal="true"
                 android:textColor="@color/White"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:gravity="center"/>
 
             <ImageView
                 android:id="@+id/icon_edit_balance"
