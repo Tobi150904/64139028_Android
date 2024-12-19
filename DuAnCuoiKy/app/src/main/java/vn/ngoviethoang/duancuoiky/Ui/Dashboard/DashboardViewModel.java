@@ -1,17 +1,20 @@
-// DashboardViewModel.java
 package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
+import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 import vn.ngoviethoang.duancuoiky.data.repository.TaiKhoanRepository;
 
@@ -89,22 +92,33 @@ public class DashboardViewModel extends AndroidViewModel {
 
     public void initializeDashboard() {
         updateDateRange("day");
-        switchTab("income");
+        switchTab("expenses");
     }
 
     public void loadAccounts() {
         taiKhoanRepository.getAllTaiKhoan().observeForever(accounts -> {
             this.accounts.setValue(accounts);
-            int total = 0;
-            for (TaiKhoan account : accounts) {
-                total += account.getSodu();
-            }
-            totalBalance.setValue(total);
+            updateTotalBalance(accounts);
         });
+    }
+
+    private void updateTotalBalance(List<TaiKhoan> accounts) {
+        int total = 0;
+        for (TaiKhoan account : accounts) {
+            total += account.getSodu();
+        }
+        totalBalance.setValue(total);
     }
 
     public void updateBalance(TaiKhoan taiKhoan) {
         taiKhoanRepository.updateTaiKhoan(taiKhoan);
         loadAccounts();
+    }
+
+    public byte[] getAccountIconBytes() {
+        Bitmap bitmap = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.ic_account1);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        return outputStream.toByteArray();
     }
 }

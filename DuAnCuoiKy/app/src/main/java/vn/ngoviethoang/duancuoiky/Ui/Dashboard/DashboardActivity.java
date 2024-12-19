@@ -8,10 +8,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,24 +23,22 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.Ui.Account.AccountActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.AddTransactionActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
-import vn.ngoviethoang.duancuoiky.data.repository.TaiKhoanRepository;
 
 public class DashboardActivity extends AppCompatActivity {
     private DashboardViewModel dashboardViewModel;
     private TextView totalBalanceAmount, dateRange, tabExpenses, tabIncome, tabDay, tabWeek, tabMonth, tabYear, tabCustom;
-    private ImageView iconMenu, iconList, iconAdd, iconEditBalance;
+    private ImageView iconMenu, iconList, iconAdd, iconEditBalance, iconDown;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    private TaiKhoanRepository taiKhoanRepository;
     private int userId;
 
     @Override
@@ -46,12 +46,20 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        initializeViews();
+        setupViewModel();
+        setupListeners();
+        initializeDashboard();
+    }
+
+    private void initializeViews() {
         totalBalanceAmount = findViewById(R.id.total_balance_amount);
         dateRange = findViewById(R.id.date_range);
         iconMenu = findViewById(R.id.icon_menu);
         iconList = findViewById(R.id.icon_list);
         iconAdd = findViewById(R.id.icon_add_transaction);
         iconEditBalance = findViewById(R.id.icon_edit_balance);
+        iconDown = findViewById(R.id.icon_down);
         tabExpenses = findViewById(R.id.tab_expenses);
         tabIncome = findViewById(R.id.tab_income);
         tabDay = findViewById(R.id.tab_day);
@@ -61,23 +69,28 @@ public class DashboardActivity extends AppCompatActivity {
         tabCustom = findViewById(R.id.tab_custom);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+    }
 
-        taiKhoanRepository = new TaiKhoanRepository(getApplication());
+    private void setupViewModel() {
         userId = getIntent().getIntExtra("USER_ID", -1);
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         dashboardViewModel.getDateRange().observe(this, dateRange::setText);
         dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,d VND", balance)));
+        dashboardViewModel.getAccounts().observe(this, this::updateAccountUI);
+    }
 
+    private void setupListeners() {
         iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(navigationView));
         iconList.setOnClickListener(v -> startActivity(new Intent(this, TransactionDetailActivity.class)));
         iconAdd.setOnClickListener(v -> startActivity(new Intent(this, AddTransactionActivity.class)));
         iconEditBalance.setOnClickListener(v -> showEditBalanceDialog());
+        iconDown.setOnClickListener(v -> showAccountsDialog());
 
-        tabDay.setOnClickListener(v -> dashboardViewModel.updateDateRange("day"));
-        tabWeek.setOnClickListener(v -> dashboardViewModel.updateDateRange("week"));
-        tabMonth.setOnClickListener(v -> dashboardViewModel.updateDateRange("month"));
-        tabYear.setOnClickListener(v -> dashboardViewModel.updateDateRange("year"));
+        tabDay.setOnClickListener(v -> selectDateRangeTab(tabDay, "day"));
+        tabWeek.setOnClickListener(v -> selectDateRangeTab(tabWeek, "week"));
+        tabMonth.setOnClickListener(v -> selectDateRangeTab(tabMonth, "month"));
+        tabYear.setOnClickListener(v -> selectDateRangeTab(tabYear, "year"));
         tabCustom.setOnClickListener(v -> showDatePickerDialog());
 
         tabExpenses.setOnClickListener(v -> selectTab(tabExpenses, "expenses"));
@@ -104,29 +117,47 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, TransactionDetailActivity.class));
                 return true;
             }
+
             drawerLayout.closeDrawer(navigationView);
             return false;
         });
+    }
 
-        // Initialize dashboard
+    private void initializeDashboard() {
         dashboardViewModel.initializeDashboard();
+        selectTab(tabExpenses, "expenses");
+        selectDateRangeTab(tabDay, "day");
     }
 
     private void selectTab(TextView selectedTab, String tab) {
         resetTab(tabExpenses);
         resetTab(tabIncome);
 
-        selectedTab.setTextColor(getResources().getColor(R.color.Red));
-        selectedTab.setTypeface(null, Typeface.BOLD);
-        selectedTab.setPaintFlags(selectedTab.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-
+        highlightTab(selectedTab);
         dashboardViewModel.switchTab(tab);
     }
 
+    private void selectDateRangeTab(TextView selectedTab, String range) {
+        resetTab(tabDay);
+        resetTab(tabWeek);
+        resetTab(tabMonth);
+        resetTab(tabYear);
+        resetTab(tabCustom);
+
+        highlightTab(selectedTab);
+        dashboardViewModel.updateDateRange(range);
+    }
+
     private void resetTab(TextView tab) {
-        tab.setTextColor(getResources().getColor(R.color.White));
+        tab.setTextColor(getResources().getColor(R.color.Gray));
         tab.setTypeface(null, Typeface.NORMAL);
         tab.setPaintFlags(tab.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
+    }
+
+    private void highlightTab(TextView tab) {
+        tab.setTextColor(getResources().getColor(R.color.Red));
+        tab.setTypeface(null, Typeface.BOLD);
+        tab.setPaintFlags(tab.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     }
 
     private void showAccountsDialog() {
@@ -134,48 +165,95 @@ public class DashboardActivity extends AppCompatActivity {
         dialog.setContentView(R.layout.dialog_accounts);
 
         LinearLayout accountsContainer = dialog.findViewById(R.id.accounts_container);
+        LinearLayout totalContainer = dialog.findViewById(R.id.total_container);
+        TextView totalBalanceAmount = dialog.findViewById(R.id.text_total_amt);
+        TextView btnCancel = dialog.findViewById(R.id.btn_cancel);
+        TextView btnChoice = dialog.findViewById(R.id.btn_choice);
 
         dashboardViewModel.getAccounts().observe(this, accounts -> {
             accountsContainer.removeAllViews();
+            double total = 0;
             for (TaiKhoan account : accounts) {
-                LinearLayout accountLayout = new LinearLayout(this);
-                accountLayout.setOrientation(LinearLayout.HORIZONTAL);
-                accountLayout.setPadding(10, 10, 10, 10);
-                accountLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                ));
-
-                ImageView accountIcon = new ImageView(this);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(account.getIcon(), 0, account.getIcon().length);
-                accountIcon.setImageBitmap(bitmap);
-                LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(64, 64); // Adjust size
-                iconParams.setMargins(0, 0, 16, 0); // Add margin to the right
-                accountIcon.setLayoutParams(iconParams);
-                accountIcon.setContentDescription("Account Icon");
-
-                TextView accountName = new TextView(this);
-                accountName.setText(account.getTen());
-                accountName.setTextSize(16); // Adjust text size
-                accountName.setTextColor(getResources().getColor(R.color.Black));
-                accountName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-                accountName.setPadding(8, 0, 0, 0);
-
-                accountLayout.addView(accountIcon);
-                accountLayout.addView(accountName);
-
-                accountLayout.setOnClickListener(v -> {
-                    totalBalanceAmount.setText(account.getTen());
-                    iconEditBalance.setVisibility(View.VISIBLE);
-                    dialog.dismiss();
-                });
-
+                LinearLayout accountLayout = createAccountLayout(account, dialog);
                 accountsContainer.addView(accountLayout);
+                total += account.getSodu();
             }
+            totalBalanceAmount.setText(String.format("%,.0f đ", total));
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        btnChoice.setOnClickListener(v -> {
+            // Handle choice action
+            dialog.dismiss();
         });
 
         dialog.show();
     }
+
+    private LinearLayout createAccountLayout(TaiKhoan account, Dialog dialog) {
+        LinearLayout accountLayout = new LinearLayout(this);
+        accountLayout.setOrientation(LinearLayout.HORIZONTAL);
+        accountLayout.setPadding(10, 10, 10, 10);
+        accountLayout.setGravity(Gravity.CENTER_VERTICAL); // Căn giữa các thành phần theo trục Y
+        accountLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        // Tạo RadioButton
+        RadioButton radioButton = new RadioButton(this);
+        LinearLayout.LayoutParams radioParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, // Sử dụng WRAP_CONTENT để kích thước phù hợp
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        radioParams.setMargins(0, 0, 16, 0); // Khoảng cách với các thành phần khác
+        radioButton.setLayoutParams(radioParams);
+
+        // Tạo ImageView
+        ImageView accountIcon = new ImageView(this);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(account.getIcon(), 0, account.getIcon().length);
+        accountIcon.setImageBitmap(bitmap);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(
+                80, 80
+        );
+        iconParams.setMargins(16, 0, 16, 0);
+        accountIcon.setLayoutParams(iconParams);
+        accountIcon.setContentDescription("Account Icon");
+
+        // Tạo container cho TextView
+        LinearLayout textContainer = new LinearLayout(this);
+        textContainer.setOrientation(LinearLayout.VERTICAL);
+        textContainer.setPadding(16, 0, 0, 0);
+        textContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1
+        ));
+
+        // Tạo TextView cho tên tài khoản
+        TextView accountName = new TextView(this);
+        accountName.setText(account.getTen());
+        accountName.setTextSize(16);
+        accountName.setTextColor(getResources().getColor(R.color.Black));
+        accountName.setPadding(8, 0, 0, 0);
+
+        // Tạo TextView cho số dư tài khoản
+        TextView accountAmount = new TextView(this);
+        accountAmount.setText(String.format("%,.0f đ", account.getSodu()));
+        accountAmount.setTextSize(14);
+        accountAmount.setTextColor(getResources().getColor(R.color.Gray));
+        accountAmount.setPadding(8, 0, 0, 0);
+
+        // Thêm TextView vào container
+        textContainer.addView(accountName);
+        textContainer.addView(accountAmount);
+
+        // Thêm các thành phần vào layout chính
+        accountLayout.addView(radioButton);
+        accountLayout.addView(accountIcon);
+        accountLayout.addView(textContainer);
+
+        return accountLayout;
+    }
+
 
     private void showEditBalanceDialog() {
         Dialog dialog = new Dialog(this);
@@ -193,25 +271,24 @@ public class DashboardActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> {
             try {
                 double newBalance = Double.parseDouble(editBalance.getText().toString());
-
-                // Chuyển Id thành byte array
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_account1);
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                byte[] iconBytes = outputStream.toByteArray();
-
-                TaiKhoan taiKhoan = new TaiKhoan("Tài khoản chính", newBalance, iconBytes);
-                dashboardViewModel.updateBalance(taiKhoan);
-                totalBalanceAmount.setText(String.valueOf(newBalance));
-
-                Toast.makeText(this, "Số dư đã được cập nhật!", Toast.LENGTH_SHORT).show();
+                updateAccountBalance(newBalance);
                 dialog.dismiss();
             } catch (NumberFormatException e) {
-                Toast.makeText(this, "Vui lòng nhập số tiền hợp lệ!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Số dư không hợp lệ!", Toast.LENGTH_SHORT).show();
             }
         });
 
         dialog.show();
+    }
+
+    private void updateAccountBalance(double newBalance) {
+        TaiKhoan selectedAccount = (TaiKhoan) totalBalanceAmount.getTag();
+        if (selectedAccount != null) {
+            selectedAccount.setSodu(newBalance);
+            dashboardViewModel.updateBalance(selectedAccount);
+            totalBalanceAmount.setText(String.format("%,.0f đ", newBalance));
+            Toast.makeText(this, "Số dư đã được cập nhật!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showDatePickerDialog() {
@@ -232,5 +309,9 @@ public class DashboardActivity extends AppCompatActivity {
         };
 
         new DatePickerDialog(this, startDateListener, startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH), startDate.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private void updateAccountUI(List<TaiKhoan> accounts) {
+        // Update UI based on the accounts list
     }
 }

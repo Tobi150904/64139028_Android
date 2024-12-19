@@ -61,11 +61,11 @@
 
             <ImageView
                 android:id="@+id/icon_down"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_below="@id/total_balance_amount"
-                android:layout_marginStart="-27dp"
-                android:layout_marginTop="-66dp"
+                android:layout_marginStart="-24dp"
+                android:layout_marginTop="-61dp"
                 android:layout_toEndOf="@id/total_balance_amount"
                 android:contentDescription="Show Accounts"
                 android:src="@drawable/ic_down" />

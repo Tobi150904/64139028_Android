@@ -94,30 +94,34 @@ public class AccountActivity extends AppCompatActivity {
             ImageView accountIcon = new ImageView(this);
             Bitmap bitmap = BitmapFactory.decodeByteArray(account.getIcon(), 0, account.getIcon().length);
             accountIcon.setImageBitmap(bitmap);
-            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(64, 64); // Adjust size
-            iconParams.setMargins(0, 0, 16, 0); // Add margin to the right
+            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(64, 64);
+            iconParams.setMargins(0, 0, 16, 0);
             accountIcon.setLayoutParams(iconParams);
             accountIcon.setContentDescription("Account Icon");
 
+            LinearLayout textContainer = new LinearLayout(this);
+            textContainer.setOrientation(LinearLayout.VERTICAL);
+            textContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1
+            ));
+
             TextView accountName = new TextView(this);
             accountName.setText(account.getTen());
-            accountName.setTextSize(16); // Adjust text size
+            accountName.setTextSize(16);
             accountName.setTextColor(getResources().getColor(R.color.Black));
-            accountName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             accountName.setPadding(8, 0, 0, 0);
 
             TextView accountAmount = new TextView(this);
             accountAmount.setText(String.format("%,.0f đ", account.getSodu()));
-            accountAmount.setTextSize(16); // Adjust text size
+            accountAmount.setTextSize(14);
             accountAmount.setTextColor(getResources().getColor(R.color.Gray));
-            accountAmount.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
+            accountAmount.setPadding(8, 0, 0, 0);
+
+            textContainer.addView(accountName);
+            textContainer.addView(accountAmount);
 
             accountLayout.addView(accountIcon);
-            accountLayout.addView(accountName);
-            accountLayout.addView(accountAmount);
+            accountLayout.addView(textContainer);
 
             accountsContainer.addView(accountLayout);
         }
