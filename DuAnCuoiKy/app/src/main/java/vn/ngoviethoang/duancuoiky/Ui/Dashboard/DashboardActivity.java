@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -127,6 +128,13 @@ public class DashboardActivity extends AppCompatActivity {
         dashboardViewModel.initializeDashboard();
         selectTab(tabExpenses, "expenses");
         selectDateRangeTab(tabDay, "day");
+
+        Integer totalBalance = dashboardViewModel.getTotalBalance().getValue();
+        if (totalBalance != null) {
+            updateMainUI("Tổng cộng", totalBalance);
+        } else {
+            updateMainUI("Tổng cộng", 0);
+        }
     }
 
     private void selectTab(TextView selectedTab, String tab) {
@@ -160,56 +168,126 @@ public class DashboardActivity extends AppCompatActivity {
         tab.setPaintFlags(tab.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     }
 
+    private RadioButton lastCheckedRadioButton = null; // Lưu RadioButton được chọn cuối cùng
+
     private void showAccountsDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_accounts);
 
-        LinearLayout accountsContainer = dialog.findViewById(R.id.accounts_container);
+        RadioGroup accountsContainer = dialog.findViewById(R.id.accounts_container);
         LinearLayout totalContainer = dialog.findViewById(R.id.total_container);
         TextView totalBalanceAmount = dialog.findViewById(R.id.text_total_amt);
         TextView btnCancel = dialog.findViewById(R.id.btn_cancel);
         TextView btnChoice = dialog.findViewById(R.id.btn_choice);
+        RadioButton radioTotal = dialog.findViewById(R.id.radio_total);
 
+        // Set "Tổng cộng" as the default selected option
+        radioTotal.setChecked(true);
+        lastCheckedRadioButton = radioTotal;
+
+        // Theo dõi danh sách tài khoản từ ViewModel
         dashboardViewModel.getAccounts().observe(this, accounts -> {
-            accountsContainer.removeAllViews();
+            accountsContainer.removeAllViews(); // Xóa các tài khoản cũ trước khi thêm mới
+            accountsContainer.addView(totalContainer); // Add the totalContainer back after clearing
+
             double total = 0;
             for (TaiKhoan account : accounts) {
+                // Tạo layout chứa thông tin tài khoản
                 LinearLayout accountLayout = createAccountLayout(account, dialog);
-                accountsContainer.addView(accountLayout);
-                total += account.getSodu();
+
+                // Tìm RadioButton từ layout được tạo
+                RadioButton radioButton = (RadioButton) accountLayout.getChildAt(0);
+
+                // Thiết lập sự kiện để xử lý chọn một tài khoản duy nhất
+                radioButton.setOnClickListener(v -> {
+                    if (lastCheckedRadioButton != null) {
+                        lastCheckedRadioButton.setChecked(false); // Bỏ chọn RadioButton trước đó
+                    }
+                    lastCheckedRadioButton = radioButton; // Cập nhật RadioButton đang được chọn
+                    radioButton.setChecked(true); // Đảm bảo RadioButton này luôn được chọn
+                });
+
+                accountsContainer.addView(accountLayout); // Thêm layout tài khoản vào container
+                total += account.getSodu(); // Tính tổng số dư
             }
+
+            // Hiển thị tổng số dư
             totalBalanceAmount.setText(String.format("%,.0f đ", total));
         });
 
+        // Hủy dialog khi nhấn nút "Hủy"
         btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        // Xử lý logic khi nhấn nút "Chọn"
         btnChoice.setOnClickListener(v -> {
-            // Handle choice action
+            if (lastCheckedRadioButton != null) {
+                if (lastCheckedRadioButton == radioTotal) {
+                    // Hiển thị tổng cộng
+                    updateMainUI("Tổng cộng", dashboardViewModel.getTotalBalance().getValue());
+                    Toast.makeText(this, "Bạn đã chọn: Tổng cộng", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Lấy tài khoản được chọn từ RadioButton
+                    LinearLayout selectedLayout = (LinearLayout) lastCheckedRadioButton.getParent();
+                    LinearLayout textContainer = (LinearLayout) selectedLayout.getChildAt(2);
+                    TextView selectedAccountName = (TextView) textContainer.getChildAt(0);
+                    TextView selectedAccountAmount = (TextView) textContainer.getChildAt(1);
+                    updateMainUI(selectedAccountName.getText().toString(), Double.parseDouble(selectedAccountAmount.getText().toString().replace(" đ", "").replace(",", "")));
+                    Toast.makeText(this, "Bạn đã chọn: " + selectedAccountName.getText().toString(), Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Vui lòng chọn tài khoản", Toast.LENGTH_SHORT).show();
+            }
             dialog.dismiss();
         });
 
+        // Thiết lập sự kiện để xử lý chọn "Tổng cộng"
+        radioTotal.setOnClickListener(v -> {
+            if (lastCheckedRadioButton != null) {
+                lastCheckedRadioButton.setChecked(false); // Bỏ chọn RadioButton trước đó
+            }
+            lastCheckedRadioButton = radioTotal; // Cập nhật RadioButton đang được chọn
+            radioTotal.setChecked(true); // Đảm bảo RadioButton này luôn được chọn
+        });
+
         dialog.show();
+    }
+
+    private void updateMainUI(String accountName, double balance) {
+        TextView mainAccountName = findViewById(R.id.total_balance_label);
+        TextView mainAccountBalance = findViewById(R.id.total_balance_amount);
+        ImageView iconEditBalance = findViewById(R.id.icon_edit_balance);
+
+        mainAccountName.setText(accountName);
+        mainAccountBalance.setText(String.format("%,.0f đ", balance));
+
+        if ("Tổng cộng".equals(accountName)) {
+            iconEditBalance.setVisibility(View.GONE);
+            totalBalanceAmount.setTag(null);
+        } else {
+            iconEditBalance.setVisibility(View.VISIBLE);
+            TaiKhoan selectedAccount = dashboardViewModel.getAccountByName(accountName);
+            totalBalanceAmount.setTag(selectedAccount);
+        }
     }
 
     private LinearLayout createAccountLayout(TaiKhoan account, Dialog dialog) {
         LinearLayout accountLayout = new LinearLayout(this);
         accountLayout.setOrientation(LinearLayout.HORIZONTAL);
         accountLayout.setPadding(10, 10, 10, 10);
-        accountLayout.setGravity(Gravity.CENTER_VERTICAL); // Căn giữa các thành phần theo trục Y
+        accountLayout.setGravity(Gravity.CENTER_VERTICAL);
         accountLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
 
-        // Tạo RadioButton
         RadioButton radioButton = new RadioButton(this);
         LinearLayout.LayoutParams radioParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, // Sử dụng WRAP_CONTENT để kích thước phù hợp
+                LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        radioParams.setMargins(0, 0, 16, 0); // Khoảng cách với các thành phần khác
+        radioParams.setMargins(0, 0, 16, 0);
         radioButton.setLayoutParams(radioParams);
 
-        // Tạo ImageView
         ImageView accountIcon = new ImageView(this);
         Bitmap bitmap = BitmapFactory.decodeByteArray(account.getIcon(), 0, account.getIcon().length);
         accountIcon.setImageBitmap(bitmap);
@@ -220,33 +298,28 @@ public class DashboardActivity extends AppCompatActivity {
         accountIcon.setLayoutParams(iconParams);
         accountIcon.setContentDescription("Account Icon");
 
-        // Tạo container cho TextView
         LinearLayout textContainer = new LinearLayout(this);
         textContainer.setOrientation(LinearLayout.VERTICAL);
-        textContainer.setPadding(16, 0, 0, 0);
+        textContainer.setPadding(32, 0, 0, 0);
         textContainer.setLayoutParams(new LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1
         ));
 
-        // Tạo TextView cho tên tài khoản
         TextView accountName = new TextView(this);
         accountName.setText(account.getTen());
         accountName.setTextSize(16);
         accountName.setTextColor(getResources().getColor(R.color.Black));
         accountName.setPadding(8, 0, 0, 0);
 
-        // Tạo TextView cho số dư tài khoản
         TextView accountAmount = new TextView(this);
         accountAmount.setText(String.format("%,.0f đ", account.getSodu()));
         accountAmount.setTextSize(14);
         accountAmount.setTextColor(getResources().getColor(R.color.Gray));
         accountAmount.setPadding(8, 0, 0, 0);
 
-        // Thêm TextView vào container
         textContainer.addView(accountName);
         textContainer.addView(accountAmount);
 
-        // Thêm các thành phần vào layout chính
         accountLayout.addView(radioButton);
         accountLayout.addView(accountIcon);
         accountLayout.addView(textContainer);
@@ -314,4 +387,6 @@ public class DashboardActivity extends AppCompatActivity {
     private void updateAccountUI(List<TaiKhoan> accounts) {
         // Update UI based on the accounts list
     }
+
+
 }

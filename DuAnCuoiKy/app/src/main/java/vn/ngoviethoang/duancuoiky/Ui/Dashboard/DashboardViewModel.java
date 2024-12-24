@@ -121,4 +121,15 @@ public class DashboardViewModel extends AndroidViewModel {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         return outputStream.toByteArray();
     }
+
+    public TaiKhoan getAccountByName(String accountName) {
+        if (accounts.getValue() != null) {
+            for (TaiKhoan account : accounts.getValue()) {
+                if (account.getTen().equals(accountName)) {
+                    return account;
+                }
+            }
+        }
+        return null;
+    }
 }
