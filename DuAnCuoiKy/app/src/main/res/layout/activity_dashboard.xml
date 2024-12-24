@@ -226,6 +226,7 @@
             </RelativeLayout>
 
             <LinearLayout
+                android:id="@+id/transaction_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"

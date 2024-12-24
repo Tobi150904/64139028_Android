@@ -8,6 +8,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import vn.ngoviethoang.duancuoiky.data.database.DateConverter;
@@ -21,7 +22,7 @@ import vn.ngoviethoang.duancuoiky.data.database.DateConverter;
         indices = {@Index("taiKhoanId"), @Index("danhMucId")}
 )
 @TypeConverters(DateConverter.class)
-public class GiaoDich {
+public class GiaoDich implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public int id;
 

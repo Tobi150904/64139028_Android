@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -63,6 +64,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         todayDate = findViewById(R.id.today_date);
         yesterdayDate = findViewById(R.id.yesterday_date);
         twoDaysAgoDate = findViewById(R.id.two_days_ago_date);
+        calendarButton = findViewById(R.id.ic_calendar);
 
         viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
@@ -74,6 +76,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         tabExpense.setOnClickListener(v -> switchToExpense());
         tabIncome.setOnClickListener(v -> switchToIncome());
         addCardButton.setOnClickListener(v -> showAddCardDialog());
+        calendarButton.setOnClickListener(v -> showDatePickerDialog());
 
         // Replace fragment with default category
         replaceFragment(new Fragment_ChiPhi());
@@ -240,6 +243,19 @@ public class AddTransactionActivity extends AppCompatActivity {
         cardTextView.setPadding(16, 16, 16, 16);
         cardTextView.setBackgroundResource(R.drawable.card_background); // Assuming you have a drawable for card background
 
+        // Add click listener to change background color when selected
+        cardTextView.setOnClickListener(v -> {
+            // Reset background color for all cards
+            for (int i = 0; i < cardContainer.getChildCount(); i++) {
+                View child = cardContainer.getChildAt(i);
+                if (child instanceof TextView) {
+                    child.setBackgroundResource(R.drawable.card_background); // Reset to default background
+                }
+            }
+            // Set background color for selected card
+            cardTextView.setBackgroundColor(getResources().getColor(R.color.Green));
+        });
+
         // Add the new card view before the "Add Card" button
         cardContainer.addView(cardTextView, cardContainer.indexOfChild(addCardButton));
     }
@@ -298,7 +314,9 @@ public class AddTransactionActivity extends AppCompatActivity {
         viewModel.getGiaoDich().observe(this, giaoDich1 -> {
             if (giaoDich1 != null) {
                 Toast.makeText(AddTransactionActivity.this, "Giao dịch đã được lưu", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, DashboardActivity.class));
+                Intent intent = new Intent(this, DashboardActivity.class);
+                intent.putExtra("NEW_TRANSACTION", giaoDich1);
+                startActivity(intent);
                 finish();
             }
         });

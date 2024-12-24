@@ -32,6 +32,7 @@ import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.Ui.Account.AccountActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.AddTransactionActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
+import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -51,6 +52,11 @@ public class DashboardActivity extends AppCompatActivity {
         setupViewModel();
         setupListeners();
         initializeDashboard();
+
+        GiaoDich newTransaction = (GiaoDich) getIntent().getSerializableExtra("NEW_TRANSACTION");
+        if (newTransaction != null) {
+            addTransactionToUI(newTransaction);
+        }
     }
 
     private void initializeViews() {
@@ -388,5 +394,35 @@ public class DashboardActivity extends AppCompatActivity {
         // Update UI based on the accounts list
     }
 
+
+    private void addTransactionToUI(GiaoDich transaction) {
+        LinearLayout transactionContainer = findViewById(R.id.transaction_list); // Assuming you have a LinearLayout with this ID
+
+        LinearLayout transactionLayout = new LinearLayout(this);
+        transactionLayout.setOrientation(LinearLayout.HORIZONTAL);
+        transactionLayout.setPadding(10, 10, 10, 10);
+
+        ImageView transactionIcon = new ImageView(this);
+        transactionIcon.setLayoutParams(new LinearLayout.LayoutParams(24, 24));
+        transactionIcon.setImageResource(R.drawable.ic_entertain); // Set the appropriate icon
+
+        TextView transactionName = new TextView(this);
+        transactionName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        transactionName.setText(transaction.getGhiChu());
+        transactionName.setTextColor(getResources().getColor(R.color.Black));
+        transactionName.setTextSize(14);
+
+        TextView transactionAmount = new TextView(this);
+        transactionAmount.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        transactionAmount.setText(String.format("%,.0f đ", transaction.getSoTien()));
+        transactionAmount.setTextColor(getResources().getColor(R.color.Gray));
+        transactionAmount.setTextSize(14);
+
+        transactionLayout.addView(transactionIcon);
+        transactionLayout.addView(transactionName);
+        transactionLayout.addView(transactionAmount);
+
+        transactionContainer.addView(transactionLayout);
+    }
 
 }
