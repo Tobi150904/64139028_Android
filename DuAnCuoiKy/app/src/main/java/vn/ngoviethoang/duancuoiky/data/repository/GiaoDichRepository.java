@@ -1,8 +1,10 @@
+// GiaoDichRepository.java
 package vn.ngoviethoang.duancuoiky.data.repository;
 
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
@@ -18,15 +20,22 @@ public class GiaoDichRepository {
         this.giaoDichDao = database.giaoDichDao();
     }
 
+    public void insertGiaoDich(GiaoDich giaoDich, MutableLiveData<GiaoDich> giaoDichLiveData, MutableLiveData<String> errorMessage) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                giaoDichDao.insertGiaoDich(giaoDich);
+                giaoDichLiveData.postValue(giaoDich);
+            } catch (Exception e) {
+                errorMessage.postValue(e.getMessage());
+            }
+        });
+    }
+
     public LiveData<List<GiaoDich>> getGiaoDichByLoai(String loai) {
         return giaoDichDao.getGiaoDichByLoai(loai);
     }
 
-    public void insertGiaoDich(GiaoDich giaoDich) {
-        AppDatabase.databaseWriteExecutor.execute(() -> giaoDichDao.insertGiaoDich(giaoDich));
-    }
-
-    public void deleteGiaoDich(GiaoDich giaoDich) {
-        AppDatabase.databaseWriteExecutor.execute(() -> giaoDichDao.deleteGiaoDich(giaoDich));
+    public LiveData<List<GiaoDich>> getAllGiaoDich() {
+        return giaoDichDao.getAllGiaoDich();
     }
 }

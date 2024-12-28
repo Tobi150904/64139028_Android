@@ -11,47 +11,49 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import vn.ngoviethoang.duancuoiky.Fragment_ChiPhi;
-import vn.ngoviethoang.duancuoiky.Fragment_ThuNhap;
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.Ui.Dashboard.DashboardActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Dashboard.DashboardViewModel;
+import vn.ngoviethoang.duancuoiky.Ui.Category.CategoryActivity;
+import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
 import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
+import vn.ngoviethoang.duancuoiky.data.repository.DanhMucRepository;
 
 public class AddTransactionActivity extends AppCompatActivity {
-    private ImageView backButton, addPhotoButton, calendarButton;
+    private ImageView backButton, calendarButton;
     private TextView accountName, categoryName, todayDate, yesterdayDate, twoDaysAgoDate;
     private EditText amountEditText, noteEditText;
     private TransactionViewModel viewModel;
     private DashboardViewModel dashboardViewModel;
-    private String transactionType = "expense"; // "expense" or "income"
+    private String transactionType = "chi_phi";
     private RadioButton lastCheckedRadioButton;
     private Date selectedDate;
-    private int selectedCategoryId = -1; // Variable to store selected category ID
+    private int selectedCategoryId = -1; // Biến lưu trữ ID danh mục được chọn
+    private GridLayout categoryContainer;
+    private DanhMucRepository danhMucRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_transaction);
 
-        // Initialize views
+        // Khởi tạo các view
         backButton = findViewById(R.id.ic_back);
         accountName = findViewById(R.id.account_name);
         categoryName = findViewById(R.id.category_name);
@@ -65,11 +67,13 @@ public class AddTransactionActivity extends AppCompatActivity {
         yesterdayDate = findViewById(R.id.yesterday_date);
         twoDaysAgoDate = findViewById(R.id.two_days_ago_date);
         calendarButton = findViewById(R.id.ic_calendar);
+        categoryContainer = findViewById(R.id.category_container);
 
         viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
+        danhMucRepository = new DanhMucRepository(this);
 
-        // Set click listeners
+        // Đặt các sự kiện click
         backButton.setOnClickListener(v -> finish());
         accountName.setOnClickListener(v -> showAccountsDialog());
         saveButton.setOnClickListener(v -> saveTransaction());
@@ -78,29 +82,34 @@ public class AddTransactionActivity extends AppCompatActivity {
         addCardButton.setOnClickListener(v -> showAddCardDialog());
         calendarButton.setOnClickListener(v -> showDatePickerDialog());
 
-        // Replace fragment with default category
-        replaceFragment(new Fragment_ChiPhi());
-
-        // Set up date fields
+        loadCategories(transactionType);
+        // Thiết lập các trường ngày
         setupDateFields();
     }
 
+    // Chuyển sang tab chi phí
     private void switchToExpense() {
-        transactionType = "expense";
-        replaceFragment(new Fragment_ChiPhi());
+        transactionType = "chi_phi";
+        loadCategories(transactionType); // Reload categories when switching tabs
     }
 
+    // Chuyển sang tab thu nhập
     private void switchToIncome() {
-        transactionType = "income";
-        replaceFragment(new Fragment_ThuNhap());
+        transactionType = "thu_nhap";
+        loadCategories(transactionType); // Reload categories when switching tabs
     }
 
-    private void replaceFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.commit();
+    private void loadCategories(String loai) {
+        danhMucRepository.getDanhMucByLoai(loai).observe(this, danhMucList -> {
+            categoryContainer.removeAllViews();
+            for (DanhMuc danhMuc : danhMucList) {
+                LinearLayout categoryLayout = createCategoryLayout(danhMuc);
+                categoryContainer.addView(categoryLayout);
+            }
+        });
     }
 
+    // Hiển thị dialog chọn tài khoản
     private void showAccountsDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_accounts);
@@ -109,7 +118,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         TextView btnCancel = dialog.findViewById(R.id.btn_cancel);
         TextView btnChoice = dialog.findViewById(R.id.btn_choice);
 
-        // Theo dõi danh sách tài khoản từ ViewModel
+        // Quan sát danh sách tài khoản từ ViewModel
         dashboardViewModel.getAccounts().observe(this, accounts -> {
             accountsContainer.removeAllViews(); // Xóa các tài khoản cũ trước khi thêm mới
 
@@ -117,15 +126,15 @@ public class AddTransactionActivity extends AppCompatActivity {
                 // Tạo layout chứa thông tin tài khoản
                 LinearLayout accountLayout = createAccountLayout(account, dialog);
 
-                // Tìm RadioButton từ layout được tạo
+                // Tìm RadioButton từ layout đã tạo
                 RadioButton radioButton = (RadioButton) accountLayout.getChildAt(0);
 
-                // Thiết lập sự kiện để xử lý chọn một tài khoản duy nhất
+                // Đặt sự kiện để xử lý việc chọn một tài khoản duy nhất
                 radioButton.setOnClickListener(v -> {
                     if (lastCheckedRadioButton != null) {
                         lastCheckedRadioButton.setChecked(false); // Bỏ chọn RadioButton trước đó
                     }
-                    lastCheckedRadioButton = radioButton; // Cập nhật RadioButton đang được chọn
+                    lastCheckedRadioButton = radioButton; // Cập nhật RadioButton hiện tại được chọn
                     radioButton.setChecked(true); // Đảm bảo RadioButton này luôn được chọn
                 });
 
@@ -133,10 +142,10 @@ public class AddTransactionActivity extends AppCompatActivity {
             }
         });
 
-        // Hủy dialog khi nhấn nút "Hủy"
+        // Hủy dialog khi nhấn nút "Cancel"
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
-        // Xử lý logic khi nhấn nút "Chọn"
+        // Xử lý logic khi nhấn nút "Choose"
         btnChoice.setOnClickListener(v -> {
             if (lastCheckedRadioButton != null) {
                 // Lấy tài khoản được chọn từ RadioButton
@@ -154,6 +163,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    // Tạo layout chứa thông tin tài khoản
     private LinearLayout createAccountLayout(TaiKhoan account, Dialog dialog) {
         LinearLayout accountLayout = new LinearLayout(this);
         accountLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -211,6 +221,49 @@ public class AddTransactionActivity extends AppCompatActivity {
         return accountLayout;
     }
 
+    // Tạo layout chứa thông tin danh mục
+    private LinearLayout createCategoryLayout(DanhMuc danhMuc) {
+        LinearLayout categoryLayout = new LinearLayout(this);
+        categoryLayout.setOrientation(LinearLayout.VERTICAL);
+        categoryLayout.setPadding(20, 10, 20, 10);
+        categoryLayout.setGravity(Gravity.CENTER);
+
+        ImageView categoryIcon = new ImageView(this);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(danhMuc.getIcon(), 0, danhMuc.getIcon().length);
+        categoryIcon.setImageBitmap(bitmap);
+        categoryIcon.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
+
+        TextView categoryName = new TextView(this);
+        categoryName.setText(danhMuc.getTenDanhMuc());
+        categoryName.setTextSize(14);
+        categoryName.setTextColor(getResources().getColor(R.color.Black));
+        categoryName.setGravity(Gravity.CENTER);
+
+        categoryLayout.addView(categoryIcon);
+        categoryLayout.addView(categoryName);
+
+        categoryLayout.setOnClickListener(v -> {
+            highlightSelectedCategory(categoryLayout);
+            selectedCategoryId = danhMuc.getId(); // Cập nhật ID danh mục được chọn
+        });
+
+        return categoryLayout;
+    }
+
+    // Làm nổi bật danh mục được chọn
+    private void highlightSelectedCategory(LinearLayout selectedCategoryLayout) {
+        // Đặt lại màu nền cho tất cả các danh mục
+        for (int i = 0; i < categoryContainer.getChildCount(); i++) {
+            View child = categoryContainer.getChildAt(i);
+            if (child instanceof LinearLayout) {
+                child.setBackgroundColor(getResources().getColor(R.color.White)); // Đặt lại nền mặc định
+            }
+        }
+        // Đặt màu nền cho danh mục được chọn
+        selectedCategoryLayout.setBackgroundColor(getResources().getColor(R.color.Gray));
+    }
+
+    // Hiển thị dialog thêm thẻ
     private void showAddCardDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_add_card);
@@ -233,33 +286,35 @@ public class AddTransactionActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    // Thêm view thẻ mới vào giao diện
     private void addCardView(String cardName) {
-        LinearLayout cardContainer = findViewById(R.id.card_container); // Assuming you have a LinearLayout with this ID
+        LinearLayout cardContainer = findViewById(R.id.card_container); // Giả sử bạn có LinearLayout với ID này
         Button addCardButton = findViewById(R.id.add_card_button);
 
         TextView cardTextView = new TextView(this);
         cardTextView.setText(cardName);
         cardTextView.setTextSize(16);
         cardTextView.setPadding(16, 16, 16, 16);
-        cardTextView.setBackgroundResource(R.drawable.card_background); // Assuming you have a drawable for card background
+        cardTextView.setBackgroundResource(R.drawable.card_background); // Giả sử bạn có drawable cho nền thẻ
 
-        // Add click listener to change background color when selected
+        // Thêm sự kiện click để thay đổi màu nền khi được chọn
         cardTextView.setOnClickListener(v -> {
-            // Reset background color for all cards
+            // Đặt lại màu nền cho tất cả các thẻ
             for (int i = 0; i < cardContainer.getChildCount(); i++) {
                 View child = cardContainer.getChildAt(i);
                 if (child instanceof TextView) {
-                    child.setBackgroundResource(R.drawable.card_background); // Reset to default background
+                    child.setBackgroundResource(R.drawable.card_background); // Đặt lại nền mặc định
                 }
             }
-            // Set background color for selected card
+            // Đặt màu nền cho thẻ được chọn
             cardTextView.setBackgroundColor(getResources().getColor(R.color.Green));
         });
 
-        // Add the new card view before the "Add Card" button
+        // Thêm view thẻ mới trước nút "Add Card"
         cardContainer.addView(cardTextView, cardContainer.indexOfChild(addCardButton));
     }
 
+    // Thiết lập các trường ngày
     private void setupDateFields() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Calendar calendar = Calendar.getInstance();
@@ -286,6 +341,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         });
     }
 
+    // Làm nổi bật ngày được chọn
     private void highlightSelectedDate(TextView selectedDateView) {
         todayDate.setTextColor(getResources().getColor(R.color.Gray));
         yesterdayDate.setTextColor(getResources().getColor(R.color.Gray));
@@ -294,6 +350,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         selectedDateView.setTextColor(getResources().getColor(R.color.Green));
     }
 
+    // Lưu giao dịch
     private void saveTransaction() {
         String amountString = amountEditText.getText().toString().trim();
         String note = noteEditText.getText().toString().trim();
@@ -304,13 +361,23 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
 
         double amount = Double.parseDouble(amountString);
-        int taiKhoanId = getSelectedTaiKhoanId(); // Implement this method to get the selected account ID
-        int danhMucId = getSelectedDanhMucId(); // Implement this method to get the selected category ID
-        Date currentDate = selectedDate != null ? selectedDate : new Date(); // Use the selected date or current date
+        int taiKhoanId = getSelectedTaiKhoanId();
+        int danhMucId = selectedCategoryId;
+        Date currentDate = selectedDate != null ? selectedDate : new Date();
+
+        if (taiKhoanId == -1) {
+            Toast.makeText(this, "Vui lòng chọn tài khoản hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (danhMucId == -1) {
+            Toast.makeText(this, "Vui lòng chọn danh mục hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         GiaoDich giaoDich = new GiaoDich(taiKhoanId, danhMucId, amount, currentDate, note, transactionType);
-
         viewModel.addTransaction(giaoDich);
+
         viewModel.getGiaoDich().observe(this, giaoDich1 -> {
             if (giaoDich1 != null) {
                 Toast.makeText(AddTransactionActivity.this, "Giao dịch đã được lưu", Toast.LENGTH_SHORT).show();
@@ -320,6 +387,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         viewModel.getErrorMessage().observe(this, error -> {
             if (error != null) {
                 Toast.makeText(AddTransactionActivity.this, "Lỗi: " + error, Toast.LENGTH_SHORT).show();
@@ -327,8 +395,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         });
     }
 
+    // Lấy ID tài khoản được chọn
     private int getSelectedTaiKhoanId() {
-        // Implement logic to get the selected account ID
         if (lastCheckedRadioButton != null) {
             LinearLayout selectedLayout = (LinearLayout) lastCheckedRadioButton.getParent();
             TextView selectedAccountName = (TextView) ((LinearLayout) selectedLayout.getChildAt(2)).getChildAt(0);
@@ -342,14 +410,10 @@ public class AddTransactionActivity extends AppCompatActivity {
                 }
             }
         }
-        return -1; // Return -1 if no account is selected
+        return -1; // Trả về -1 nếu không có tài khoản nào được chọn
     }
 
-    private int getSelectedDanhMucId() {
-        // Implement logic to get the selected category ID
-        return selectedCategoryId;
-    }
-
+    // Hiển thị dialog chọn ngày
     private void showDatePickerDialog() {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(

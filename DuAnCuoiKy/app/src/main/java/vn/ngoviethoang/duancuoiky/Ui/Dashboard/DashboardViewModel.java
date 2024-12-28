@@ -15,7 +15,11 @@ import java.util.Calendar;
 import java.util.List;
 
 import vn.ngoviethoang.duancuoiky.R;
+import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
+import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
+import vn.ngoviethoang.duancuoiky.data.repository.DanhMucRepository;
+import vn.ngoviethoang.duancuoiky.data.repository.GiaoDichRepository;
 import vn.ngoviethoang.duancuoiky.data.repository.TaiKhoanRepository;
 
 public class DashboardViewModel extends AndroidViewModel {
@@ -23,13 +27,19 @@ public class DashboardViewModel extends AndroidViewModel {
     private final MutableLiveData<String> tabSelected = new MutableLiveData<>();
     private final MutableLiveData<List<TaiKhoan>> accounts = new MutableLiveData<>();
     private final MutableLiveData<Integer> totalBalance = new MutableLiveData<>();
+    private final MutableLiveData<List<GiaoDich>> transactions = new MutableLiveData<>();
 
     private final TaiKhoanRepository taiKhoanRepository;
+    private final GiaoDichRepository giaoDichRepository;
+    private final DanhMucRepository danhMucRepository;
 
     public DashboardViewModel(@NonNull Application application) {
         super(application);
         taiKhoanRepository = new TaiKhoanRepository(application);
+        giaoDichRepository = new GiaoDichRepository(application);
+        danhMucRepository = new DanhMucRepository(application);
         loadAccounts();
+        loadTransactions();
     }
 
     public LiveData<Integer> getTotalBalance() {
@@ -46,6 +56,10 @@ public class DashboardViewModel extends AndroidViewModel {
 
     public LiveData<List<TaiKhoan>> getAccounts() {
         return accounts;
+    }
+
+    public LiveData<List<GiaoDich>> getTransactions() {
+        return transactions;
     }
 
     public void updateDateRange(String range) {
@@ -131,5 +145,23 @@ public class DashboardViewModel extends AndroidViewModel {
             }
         }
         return null;
+    }
+
+    public void loadTransactions() {
+        giaoDichRepository.getAllGiaoDich().observeForever(transactions::setValue);
+    }
+
+    public String getCategoryNameById(int categoryId) {
+        DanhMuc category = danhMucRepository.getDanhMucById(categoryId);
+        return category != null ? category.getTenDanhMuc() : "Unknown";
+    }
+
+    public Bitmap getCategoryIconById(int categoryId) {
+        DanhMuc category = danhMucRepository.getDanhMucById(categoryId);
+        if (category != null) {
+            byte[] iconBytes = category.getIcon();
+            return BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+        }
+        return BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.ic_unknown);
     }
 }

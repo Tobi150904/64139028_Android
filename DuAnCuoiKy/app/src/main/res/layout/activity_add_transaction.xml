@@ -135,10 +135,13 @@
             android:textSize="16sp"
             android:textStyle="bold"/>
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
+        <GridLayout
+            android:id="@+id/category_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:padding="16dp">
+        </GridLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -205,9 +208,8 @@
 
                 <Button
                     android:id="@+id/add_card_button"
-                    android:layout_width="148dp"
+                    android:layout_width="130dp"
                     android:layout_height="wrap_content"
-
                     android:background="@drawable/button_background"
                     android:text="+ Thêm thẻ" />
             </LinearLayout>
@@ -228,29 +230,6 @@
                 android:hint="Ghi chú"
                 android:layout_marginTop="8dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ảnh"
-                android:textSize="14sp"
-                android:textColor="@color/Gray"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
-
-                <ImageView
-                    android:id="@+id/ic_add_photo"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:src="@drawable/ic_add_photo"
-                    android:contentDescription="Add Photo"
-                    android:layout_marginEnd="8dp" />
-            </LinearLayout>
         </LinearLayout>
 
         <Button

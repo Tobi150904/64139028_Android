@@ -1,3 +1,4 @@
+// DashboardActivity.java
 package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 
 import android.app.DatePickerDialog;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.Ui.Account.AccountActivity;
+import vn.ngoviethoang.duancuoiky.Ui.Category.CategoryActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.AddTransactionActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
 import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
@@ -85,8 +87,25 @@ public class DashboardActivity extends AppCompatActivity {
         dashboardViewModel.getDateRange().observe(this, dateRange::setText);
         dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,d VND", balance)));
         dashboardViewModel.getAccounts().observe(this, this::updateAccountUI);
+        dashboardViewModel.getTransactions().observe(this, this::updateTransactionUI);
     }
 
+    // Thêm phương thức để cập nhật danh sách giao dịch theo loại
+    private void updateTransactionList(String loai) {
+        LinearLayout transactionContainer = findViewById(R.id.transaction_list);
+        transactionContainer.removeAllViews(); // Xóa các giao dịch hiện tại
+
+        List<GiaoDich> transactions = dashboardViewModel.getTransactions().getValue();
+        if (transactions != null) {
+            for (GiaoDich transaction : transactions) {
+                if (transaction.getLoai().equals(loai)) {
+                    addTransactionToUI(transaction);
+                }
+            }
+        }
+    }
+
+    // Cập nhật phương thức setupListeners để gọi updateTransactionList khi chuyển đổi tab
     private void setupListeners() {
         iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(navigationView));
         iconList.setOnClickListener(v -> startActivity(new Intent(this, TransactionDetailActivity.class)));
@@ -100,8 +119,14 @@ public class DashboardActivity extends AppCompatActivity {
         tabYear.setOnClickListener(v -> selectDateRangeTab(tabYear, "year"));
         tabCustom.setOnClickListener(v -> showDatePickerDialog());
 
-        tabExpenses.setOnClickListener(v -> selectTab(tabExpenses, "expenses"));
-        tabIncome.setOnClickListener(v -> selectTab(tabIncome, "income"));
+        tabExpenses.setOnClickListener(v -> {
+            selectTab(tabExpenses, "expenses");
+            updateTransactionList("chi_phi");
+        });
+        tabIncome.setOnClickListener(v -> {
+            selectTab(tabIncome, "income");
+            updateTransactionList("thu_nhap");
+        });
 
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_dashboard) {
@@ -117,7 +142,7 @@ public class DashboardActivity extends AppCompatActivity {
                 return true;
             }
             if (item.getItemId() == R.id.nav_category) {
-                startActivity(new Intent(this, TransactionDetailActivity.class));
+                startActivity(new Intent(this, CategoryActivity.class));
                 return true;
             }
             if (item.getItemId() == R.id.nav_settings) {
@@ -333,7 +358,6 @@ public class DashboardActivity extends AppCompatActivity {
         return accountLayout;
     }
 
-
     private void showEditBalanceDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_edit_balance);
@@ -394,21 +418,30 @@ public class DashboardActivity extends AppCompatActivity {
         // Update UI based on the accounts list
     }
 
+    private void updateTransactionUI(List<GiaoDich> transactions) {
+        LinearLayout transactionContainer = findViewById(R.id.transaction_list); // Assuming you have a LinearLayout with this ID
+        transactionContainer.removeAllViews(); // Clear existing transactions
+
+        for (GiaoDich transaction : transactions) {
+            addTransactionToUI(transaction);
+        }
+    }
 
     private void addTransactionToUI(GiaoDich transaction) {
-        LinearLayout transactionContainer = findViewById(R.id.transaction_list); // Assuming you have a LinearLayout with this ID
-
         LinearLayout transactionLayout = new LinearLayout(this);
         transactionLayout.setOrientation(LinearLayout.HORIZONTAL);
         transactionLayout.setPadding(10, 10, 10, 10);
 
+        String categoryName = dashboardViewModel.getCategoryNameById(transaction.getDanhMucId());
+        Bitmap categoryIcon = dashboardViewModel.getCategoryIconById(transaction.getDanhMucId());
+
         ImageView transactionIcon = new ImageView(this);
         transactionIcon.setLayoutParams(new LinearLayout.LayoutParams(24, 24));
-        transactionIcon.setImageResource(R.drawable.ic_entertain); // Set the appropriate icon
+        transactionIcon.setImageBitmap(categoryIcon);
 
         TextView transactionName = new TextView(this);
         transactionName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        transactionName.setText(transaction.getGhiChu());
+        transactionName.setText(categoryName);
         transactionName.setTextColor(getResources().getColor(R.color.Black));
         transactionName.setTextSize(14);
 
@@ -422,7 +455,7 @@ public class DashboardActivity extends AppCompatActivity {
         transactionLayout.addView(transactionName);
         transactionLayout.addView(transactionAmount);
 
+        LinearLayout transactionContainer = findViewById(R.id.transaction_list);
         transactionContainer.addView(transactionLayout);
     }
-
 }

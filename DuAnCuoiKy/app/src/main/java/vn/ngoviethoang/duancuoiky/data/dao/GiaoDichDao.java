@@ -10,6 +10,7 @@ import androidx.room.Update;
 import java.util.Date;
 import java.util.List;
 
+import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
 import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
 
 @Dao
@@ -25,4 +26,7 @@ public interface GiaoDichDao {
 
     @Delete
     void deleteGiaoDich(GiaoDich giaoDich);
+
+    @Query("SELECT * FROM giao_dich")
+    LiveData<List<GiaoDich>> getAllGiaoDich();
 }
