@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import java.util.List;
 
@@ -41,16 +42,20 @@ public class TransactionViewModel extends AndroidViewModel {
     // Cập nhật số dư tài khoản dựa trên loại giao dịch
     private void updateAccountBalance(GiaoDich giaoDich) {
         LiveData<TaiKhoan> accountLiveData = taiKhoanRepository.getTaiKhoanById(giaoDich.getTaiKhoanId());
-        accountLiveData.observeForever(account -> {
-            if (account != null) {
-                double newBalance = account.getSodu();
-                if ("thu_nhap".equals(giaoDich.getLoai())) {
-                    newBalance += giaoDich.getSoTien();
-                } else if ("chi_phi".equals(giaoDich.getLoai())) {
-                    newBalance -= giaoDich.getSoTien();
+        accountLiveData.observeForever(new Observer<TaiKhoan>() {
+            @Override
+            public void onChanged(TaiKhoan account) {
+                if (account != null) {
+                    double newBalance = account.getSodu();
+                    if ("thu_nhap".equals(giaoDich.getLoai())) {
+                        newBalance += giaoDich.getSoTien();
+                    } else if ("chi_phi".equals(giaoDich.getLoai())) {
+                        newBalance -= giaoDich.getSoTien();
+                    }
+                    account.setSodu(newBalance);
+                    taiKhoanRepository.updateTaiKhoan(account);
+                    accountLiveData.removeObserver(this); // Remove the observer after updating the balance
                 }
-                account.setSodu(newBalance);
-                taiKhoanRepository.updateTaiKhoan(account);
             }
         });
     }

@@ -432,29 +432,40 @@ public class DashboardActivity extends AppCompatActivity {
         transactionLayout.setOrientation(LinearLayout.HORIZONTAL);
         transactionLayout.setPadding(10, 10, 10, 10);
 
-        String categoryName = dashboardViewModel.getCategoryNameById(transaction.getDanhMucId());
-        Bitmap categoryIcon = dashboardViewModel.getCategoryIconById(transaction.getDanhMucId());
-
+        // Create and add the ImageView
         ImageView transactionIcon = new ImageView(this);
-        transactionIcon.setLayoutParams(new LinearLayout.LayoutParams(24, 24));
-        transactionIcon.setImageBitmap(categoryIcon);
+        transactionIcon.setLayoutParams(new LinearLayout.LayoutParams(48, 48)); // Increase the size of the image
+        dashboardViewModel.getCategoryIconById(transaction.getDanhMucId(), danhMuc -> {
+            Bitmap categoryIcon;
+            if (danhMuc != null) {
+                byte[] iconBytes = danhMuc.getIcon();
+                categoryIcon = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+            } else {
+                categoryIcon = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.ic_unknown);
+            }
+            transactionIcon.setImageBitmap(categoryIcon);
+        });
+        transactionLayout.addView(transactionIcon); // Add the image at the first position
 
         TextView transactionName = new TextView(this);
         transactionName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        transactionName.setText(categoryName);
         transactionName.setTextColor(getResources().getColor(R.color.Black));
         transactionName.setTextSize(14);
+        transactionName.setPadding(8, 0, 0, 0);
+        dashboardViewModel.getCategoryNameById(transaction.getDanhMucId(), danhMuc -> {
+            String categoryName = danhMuc != null ? danhMuc.getTenDanhMuc() : "Unknown";
+            transactionName.setText(categoryName);
+        });
+        transactionLayout.addView(transactionName);
 
         TextView transactionAmount = new TextView(this);
         transactionAmount.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         transactionAmount.setText(String.format("%,.0f đ", transaction.getSoTien()));
         transactionAmount.setTextColor(getResources().getColor(R.color.Gray));
         transactionAmount.setTextSize(14);
+        transactionLayout.addView(transactionAmount); // Add the amount at the last position
 
-        transactionLayout.addView(transactionIcon);
-        transactionLayout.addView(transactionName);
-        transactionLayout.addView(transactionAmount);
-
+        // Add the transaction layout to the container
         LinearLayout transactionContainer = findViewById(R.id.transaction_list);
         transactionContainer.addView(transactionLayout);
     }

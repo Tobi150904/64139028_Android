@@ -14,6 +14,9 @@ import vn.ngoviethoang.duancuoiky.data.dao.DanhMucDao;
 import vn.ngoviethoang.duancuoiky.data.database.AppDatabase;
 import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
 
+// DanhMucRepository.java
+import android.os.AsyncTask;
+
 public class DanhMucRepository {
     private final DanhMucDao danhMucDao;
 
@@ -59,7 +62,21 @@ public class DanhMucRepository {
         return stream.toByteArray();
     }
 
-    public DanhMuc getDanhMucById(int id) {
-        return danhMucDao.getDanhMucById(id);
+    public void getDanhMucById(int id, OnDanhMucLoadedListener listener) {
+        new AsyncTask<Integer, Void, DanhMuc>() {
+            @Override
+            protected DanhMuc doInBackground(Integer... params) {
+                return danhMucDao.getDanhMucById(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(DanhMuc danhMuc) {
+                listener.onDanhMucLoaded(danhMuc);
+            }
+        }.execute(id);
+    }
+
+    public interface OnDanhMucLoadedListener {
+        void onDanhMucLoaded(DanhMuc danhMuc);
     }
 }

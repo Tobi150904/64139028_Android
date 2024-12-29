@@ -72,14 +72,14 @@
 
             <TextView
                 android:id="@+id/total_balance_amount"
-                android:layout_width="139dp"
+                android:layout_width="163dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/total_balance_label"
                 android:layout_centerHorizontal="true"
+                android:gravity="center"
                 android:textColor="@color/White"
                 android:textSize="24sp"
-                android:textStyle="bold"
-                android:gravity="center"/>
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/icon_edit_balance"
@@ -231,35 +231,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="10dp">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:contentDescription="Entertain Icon"
-                        android:src="@drawable/ic_entertain" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:text="Giải trí"
-                        android:textColor="@color/Black"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="500.000 đ"
-                        android:textColor="@color/Gray"
-                        android:textSize="14sp" />
-                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -151,17 +151,11 @@ public class DashboardViewModel extends AndroidViewModel {
         giaoDichRepository.getAllGiaoDich().observeForever(transactions::setValue);
     }
 
-    public String getCategoryNameById(int categoryId) {
-        DanhMuc category = danhMucRepository.getDanhMucById(categoryId);
-        return category != null ? category.getTenDanhMuc() : "Unknown";
+    public void getCategoryNameById(int categoryId, DanhMucRepository.OnDanhMucLoadedListener listener) {
+        danhMucRepository.getDanhMucById(categoryId, listener);
     }
 
-    public Bitmap getCategoryIconById(int categoryId) {
-        DanhMuc category = danhMucRepository.getDanhMucById(categoryId);
-        if (category != null) {
-            byte[] iconBytes = category.getIcon();
-            return BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-        }
-        return BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.ic_unknown);
+    public void getCategoryIconById(int categoryId, DanhMucRepository.OnDanhMucLoadedListener listener) {
+        danhMucRepository.getDanhMucById(categoryId, listener);
     }
 }
