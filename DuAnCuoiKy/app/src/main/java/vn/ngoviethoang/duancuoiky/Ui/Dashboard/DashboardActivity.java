@@ -1,4 +1,3 @@
-// DashboardActivity.java
 package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 
 import android.app.DatePickerDialog;
@@ -85,27 +84,10 @@ public class DashboardActivity extends AppCompatActivity {
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         dashboardViewModel.getDateRange().observe(this, dateRange::setText);
-        dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,d VND", balance)));
-        dashboardViewModel.getAccounts().observe(this, this::updateAccountUI);
+        dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,.2f VND", balance)));
         dashboardViewModel.getTransactions().observe(this, this::updateTransactionUI);
     }
 
-    // Thêm phương thức để cập nhật danh sách giao dịch theo loại
-    private void updateTransactionList(String loai) {
-        LinearLayout transactionContainer = findViewById(R.id.transaction_list);
-        transactionContainer.removeAllViews(); // Xóa các giao dịch hiện tại
-
-        List<GiaoDich> transactions = dashboardViewModel.getTransactions().getValue();
-        if (transactions != null) {
-            for (GiaoDich transaction : transactions) {
-                if (transaction.getLoai().equals(loai)) {
-                    addTransactionToUI(transaction);
-                }
-            }
-        }
-    }
-
-    // Cập nhật phương thức setupListeners để gọi updateTransactionList khi chuyển đổi tab
     private void setupListeners() {
         iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(navigationView));
         iconList.setOnClickListener(v -> startActivity(new Intent(this, TransactionDetailActivity.class)));
@@ -113,20 +95,37 @@ public class DashboardActivity extends AppCompatActivity {
         iconEditBalance.setOnClickListener(v -> showEditBalanceDialog());
         iconDown.setOnClickListener(v -> showAccountsDialog());
 
-        tabDay.setOnClickListener(v -> selectDateRangeTab(tabDay, "day"));
-        tabWeek.setOnClickListener(v -> selectDateRangeTab(tabWeek, "week"));
-        tabMonth.setOnClickListener(v -> selectDateRangeTab(tabMonth, "month"));
-        tabYear.setOnClickListener(v -> selectDateRangeTab(tabYear, "year"));
-        tabCustom.setOnClickListener(v -> showDatePickerDialog());
-
         tabExpenses.setOnClickListener(v -> {
             selectTab(tabExpenses, "expenses");
-            updateTransactionList("chi_phi");
+            updateFilteredTransactions("chi_phi", dashboardViewModel.getDateRange().getValue());
         });
+
         tabIncome.setOnClickListener(v -> {
             selectTab(tabIncome, "income");
-            updateTransactionList("thu_nhap");
+            updateFilteredTransactions("thu_nhap", dashboardViewModel.getDateRange().getValue());
         });
+
+        tabDay.setOnClickListener(v -> {
+            selectDateRangeTab(tabDay, "day");
+            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "day");
+        });
+
+        tabWeek.setOnClickListener(v -> {
+            selectDateRangeTab(tabWeek, "week");
+            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "week");
+        });
+
+        tabMonth.setOnClickListener(v -> {
+            selectDateRangeTab(tabMonth, "month");
+            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "month");
+        });
+
+        tabYear.setOnClickListener(v -> {
+            selectDateRangeTab(tabYear, "year");
+            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "year");
+        });
+
+        tabCustom.setOnClickListener(v -> showDatePickerDialog());
 
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_dashboard) {
@@ -159,21 +158,10 @@ public class DashboardActivity extends AppCompatActivity {
         dashboardViewModel.initializeDashboard();
         selectTab(tabExpenses, "expenses");
         selectDateRangeTab(tabDay, "day");
+        updateFilteredTransactions("chi_phi", "day");
 
-        Integer totalBalance = dashboardViewModel.getTotalBalance().getValue();
-        if (totalBalance != null) {
-            updateMainUI("Tổng cộng", totalBalance);
-        } else {
-            updateMainUI("Tổng cộng", 0);
-        }
-    }
-
-    private void selectTab(TextView selectedTab, String tab) {
-        resetTab(tabExpenses);
-        resetTab(tabIncome);
-
-        highlightTab(selectedTab);
-        dashboardViewModel.switchTab(tab);
+        Double totalBalance = dashboardViewModel.getTotalBalance().getValue();
+        updateMainUI("Tổng cộng", totalBalance != null ? totalBalance : 0);
     }
 
     private void selectDateRangeTab(TextView selectedTab, String range) {
@@ -185,6 +173,14 @@ public class DashboardActivity extends AppCompatActivity {
 
         highlightTab(selectedTab);
         dashboardViewModel.updateDateRange(range);
+    }
+
+    private void selectTab(TextView selectedTab, String tab) {
+        resetTab(tabExpenses);
+        resetTab(tabIncome);
+
+        highlightTab(selectedTab);
+        dashboardViewModel.switchTab(tab);
     }
 
     private void resetTab(TextView tab) {
@@ -199,88 +195,8 @@ public class DashboardActivity extends AppCompatActivity {
         tab.setPaintFlags(tab.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     }
 
-    private RadioButton lastCheckedRadioButton = null; // Lưu RadioButton được chọn cuối cùng
-
-    private void showAccountsDialog() {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_accounts);
-
-        RadioGroup accountsContainer = dialog.findViewById(R.id.accounts_container);
-        LinearLayout totalContainer = dialog.findViewById(R.id.total_container);
-        TextView totalBalanceAmount = dialog.findViewById(R.id.text_total_amt);
-        TextView btnCancel = dialog.findViewById(R.id.btn_cancel);
-        TextView btnChoice = dialog.findViewById(R.id.btn_choice);
-        RadioButton radioTotal = dialog.findViewById(R.id.radio_total);
-
-        // Set "Tổng cộng" as the default selected option
-        radioTotal.setChecked(true);
-        lastCheckedRadioButton = radioTotal;
-
-        // Theo dõi danh sách tài khoản từ ViewModel
-        dashboardViewModel.getAccounts().observe(this, accounts -> {
-            accountsContainer.removeAllViews(); // Xóa các tài khoản cũ trước khi thêm mới
-            accountsContainer.addView(totalContainer); // Add the totalContainer back after clearing
-
-            double total = 0;
-            for (TaiKhoan account : accounts) {
-                // Tạo layout chứa thông tin tài khoản
-                LinearLayout accountLayout = createAccountLayout(account, dialog);
-
-                // Tìm RadioButton từ layout được tạo
-                RadioButton radioButton = (RadioButton) accountLayout.getChildAt(0);
-
-                // Thiết lập sự kiện để xử lý chọn một tài khoản duy nhất
-                radioButton.setOnClickListener(v -> {
-                    if (lastCheckedRadioButton != null) {
-                        lastCheckedRadioButton.setChecked(false); // Bỏ chọn RadioButton trước đó
-                    }
-                    lastCheckedRadioButton = radioButton; // Cập nhật RadioButton đang được chọn
-                    radioButton.setChecked(true); // Đảm bảo RadioButton này luôn được chọn
-                });
-
-                accountsContainer.addView(accountLayout); // Thêm layout tài khoản vào container
-                total += account.getSodu(); // Tính tổng số dư
-            }
-
-            // Hiển thị tổng số dư
-            totalBalanceAmount.setText(String.format("%,.0f đ", total));
-        });
-
-        // Hủy dialog khi nhấn nút "Hủy"
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-
-        // Xử lý logic khi nhấn nút "Chọn"
-        btnChoice.setOnClickListener(v -> {
-            if (lastCheckedRadioButton != null) {
-                if (lastCheckedRadioButton == radioTotal) {
-                    // Hiển thị tổng cộng
-                    updateMainUI("Tổng cộng", dashboardViewModel.getTotalBalance().getValue());
-                    Toast.makeText(this, "Bạn đã chọn: Tổng cộng", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Lấy tài khoản được chọn từ RadioButton
-                    LinearLayout selectedLayout = (LinearLayout) lastCheckedRadioButton.getParent();
-                    LinearLayout textContainer = (LinearLayout) selectedLayout.getChildAt(2);
-                    TextView selectedAccountName = (TextView) textContainer.getChildAt(0);
-                    TextView selectedAccountAmount = (TextView) textContainer.getChildAt(1);
-                    updateMainUI(selectedAccountName.getText().toString(), Double.parseDouble(selectedAccountAmount.getText().toString().replace(" đ", "").replace(",", "")));
-                    Toast.makeText(this, "Bạn đã chọn: " + selectedAccountName.getText().toString(), Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(this, "Vui lòng chọn tài khoản", Toast.LENGTH_SHORT).show();
-            }
-            dialog.dismiss();
-        });
-
-        // Thiết lập sự kiện để xử lý chọn "Tổng cộng"
-        radioTotal.setOnClickListener(v -> {
-            if (lastCheckedRadioButton != null) {
-                lastCheckedRadioButton.setChecked(false); // Bỏ chọn RadioButton trước đó
-            }
-            lastCheckedRadioButton = radioTotal; // Cập nhật RadioButton đang được chọn
-            radioTotal.setChecked(true); // Đảm bảo RadioButton này luôn được chọn
-        });
-
-        dialog.show();
+    private void updateFilteredTransactions(String loai, String range) {
+        dashboardViewModel.getFilteredTransactions(loai, range).observe(this, this::updateTransactionUI);
     }
 
     private void updateMainUI(String accountName, double balance) {
@@ -299,6 +215,76 @@ public class DashboardActivity extends AppCompatActivity {
             TaiKhoan selectedAccount = dashboardViewModel.getAccountByName(accountName);
             totalBalanceAmount.setTag(selectedAccount);
         }
+    }
+
+    private void showAccountsDialog() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_accounts);
+
+        RadioGroup accountsContainer = dialog.findViewById(R.id.accounts_container);
+        LinearLayout totalContainer = dialog.findViewById(R.id.total_container);
+        TextView totalBalanceAmount = dialog.findViewById(R.id.text_total_amt);
+        TextView btnCancel = dialog.findViewById(R.id.btn_cancel);
+        TextView btnChoice = dialog.findViewById(R.id.btn_choice);
+        RadioButton radioTotal = dialog.findViewById(R.id.radio_total);
+
+        radioTotal.setChecked(true);
+        final RadioButton[] lastCheckedRadioButton = {radioTotal};
+
+        dashboardViewModel.getAccounts().observe(this, accounts -> {
+            accountsContainer.removeAllViews();
+            accountsContainer.addView(totalContainer);
+
+            double total = 0;
+            for (TaiKhoan account : accounts) {
+                LinearLayout accountLayout = createAccountLayout(account, dialog);
+                RadioButton radioButton = (RadioButton) accountLayout.getChildAt(0);
+
+                radioButton.setOnClickListener(v -> {
+                    if (lastCheckedRadioButton[0] != null) {
+                        lastCheckedRadioButton[0].setChecked(false);
+                    }
+                    lastCheckedRadioButton[0] = radioButton;
+                    radioButton.setChecked(true);
+                });
+
+                accountsContainer.addView(accountLayout);
+                total += account.getSodu();
+            }
+
+            totalBalanceAmount.setText(String.format("%,.0f đ", total));
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnChoice.setOnClickListener(v -> {
+            if (lastCheckedRadioButton[0] != null) {
+                if (lastCheckedRadioButton[0] == radioTotal) {
+                    updateMainUI("Tổng cộng", dashboardViewModel.getTotalBalance().getValue());
+                    Toast.makeText(this, "Bạn đã chọn: Tổng cộng", Toast.LENGTH_SHORT).show();
+                } else {
+                    LinearLayout selectedLayout = (LinearLayout) lastCheckedRadioButton[0].getParent();
+                    LinearLayout textContainer = (LinearLayout) selectedLayout.getChildAt(2);
+                    TextView selectedAccountName = (TextView) textContainer.getChildAt(0);
+                    TextView selectedAccountAmount = (TextView) textContainer.getChildAt(1);
+                    updateMainUI(selectedAccountName.getText().toString(), Double.parseDouble(selectedAccountAmount.getText().toString().replace(" đ", "").replace(",", "")));
+                    Toast.makeText(this, "Bạn đã chọn: " + selectedAccountName.getText().toString(), Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Vui lòng chọn tài khoản", Toast.LENGTH_SHORT).show();
+            }
+            dialog.dismiss();
+        });
+
+        radioTotal.setOnClickListener(v -> {
+            if (lastCheckedRadioButton[0] != null) {
+                lastCheckedRadioButton[0].setChecked(false);
+            }
+            lastCheckedRadioButton[0] = radioTotal;
+            radioTotal.setChecked(true);
+        });
+
+        dialog.show();
     }
 
     private LinearLayout createAccountLayout(TaiKhoan account, Dialog dialog) {
@@ -404,6 +390,7 @@ public class DashboardActivity extends AppCompatActivity {
             String start = formatter.format(startDate.getTime());
             String end = formatter.format(endDate.getTime());
             dashboardViewModel.updateCustomDateRange(start, end);
+            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "custom");
         };
 
         DatePickerDialog.OnDateSetListener startDateListener = (view, year, month, dayOfMonth) -> {
@@ -414,13 +401,9 @@ public class DashboardActivity extends AppCompatActivity {
         new DatePickerDialog(this, startDateListener, startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH), startDate.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    private void updateAccountUI(List<TaiKhoan> accounts) {
-        // Update UI based on the accounts list
-    }
-
     private void updateTransactionUI(List<GiaoDich> transactions) {
-        LinearLayout transactionContainer = findViewById(R.id.transaction_list); // Assuming you have a LinearLayout with this ID
-        transactionContainer.removeAllViews(); // Clear existing transactions
+        LinearLayout transactionContainer = findViewById(R.id.transaction_list);
+        transactionContainer.removeAllViews();
 
         for (GiaoDich transaction : transactions) {
             addTransactionToUI(transaction);
@@ -432,9 +415,8 @@ public class DashboardActivity extends AppCompatActivity {
         transactionLayout.setOrientation(LinearLayout.HORIZONTAL);
         transactionLayout.setPadding(10, 10, 10, 10);
 
-        // Create and add the ImageView
         ImageView transactionIcon = new ImageView(this);
-        transactionIcon.setLayoutParams(new LinearLayout.LayoutParams(48, 48)); // Increase the size of the image
+        transactionIcon.setLayoutParams(new LinearLayout.LayoutParams(48, 48));
         dashboardViewModel.getCategoryIconById(transaction.getDanhMucId(), danhMuc -> {
             Bitmap categoryIcon;
             if (danhMuc != null) {
@@ -445,17 +427,24 @@ public class DashboardActivity extends AppCompatActivity {
             }
             transactionIcon.setImageBitmap(categoryIcon);
         });
-        transactionLayout.addView(transactionIcon); // Add the image at the first position
+        transactionLayout.addView(transactionIcon);
 
         TextView transactionName = new TextView(this);
         transactionName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         transactionName.setTextColor(getResources().getColor(R.color.Black));
         transactionName.setTextSize(14);
         transactionName.setPadding(8, 0, 0, 0);
-        dashboardViewModel.getCategoryNameById(transaction.getDanhMucId(), danhMuc -> {
-            String categoryName = danhMuc != null ? danhMuc.getTenDanhMuc() : "Unknown";
-            transactionName.setText(categoryName);
+        dashboardViewModel.getCategoryById(transaction.getDanhMucId()).observe(this, danhMuc -> {
+            if (danhMuc != null) {
+                transactionName.setText(danhMuc.getTenDanhMuc());
+                Bitmap categoryIcon = BitmapFactory.decodeByteArray(danhMuc.getIcon(), 0, danhMuc.getIcon().length);
+                transactionIcon.setImageBitmap(categoryIcon);
+            } else {
+                transactionName.setText("Unknown");
+                transactionIcon.setImageResource(R.drawable.ic_unknown);
+            }
         });
+
         transactionLayout.addView(transactionName);
 
         TextView transactionAmount = new TextView(this);
@@ -463,9 +452,8 @@ public class DashboardActivity extends AppCompatActivity {
         transactionAmount.setText(String.format("%,.0f đ", transaction.getSoTien()));
         transactionAmount.setTextColor(getResources().getColor(R.color.Gray));
         transactionAmount.setTextSize(14);
-        transactionLayout.addView(transactionAmount); // Add the amount at the last position
+        transactionLayout.addView(transactionAmount);
 
-        // Add the transaction layout to the container
         LinearLayout transactionContainer = findViewById(R.id.transaction_list);
         transactionContainer.addView(transactionLayout);
     }

@@ -10,11 +10,13 @@ public class DanhMuc {
     public String tenDanhMuc;
     public byte[] icon;
     public String loai;
+    public String mauSac; // Thêm trường màu sắc
 
-    public DanhMuc(String tenDanhMuc, byte[] icon, String loai) {
+    public DanhMuc(String tenDanhMuc, byte[] icon, String loai, String mauSac) {
         this.tenDanhMuc = tenDanhMuc;
         this.icon = icon;
         this.loai = loai;
+        this.mauSac = mauSac;
     }
 
     public int getId() {
@@ -47,5 +49,13 @@ public class DanhMuc {
 
     public void setLoai(String loai) {
         this.loai = loai;
+    }
+
+    public String getMauSac() {
+        return mauSac;
+    }
+
+    public void setMauSac(String mauSac) {
+        this.mauSac = mauSac;
     }
 }

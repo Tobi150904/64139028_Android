@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -228,10 +230,18 @@ public class AddTransactionActivity extends AppCompatActivity {
         categoryLayout.setPadding(20, 10, 20, 10);
         categoryLayout.setGravity(Gravity.CENTER);
 
+        // Tạo ImageView để hiển thị ảnh danh mục trong hình tròn
         ImageView categoryIcon = new ImageView(this);
         Bitmap bitmap = BitmapFactory.decodeByteArray(danhMuc.getIcon(), 0, danhMuc.getIcon().length);
         categoryIcon.setImageBitmap(bitmap);
         categoryIcon.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
+
+        // Tạo hình tròn cho ImageView
+        GradientDrawable circleDrawable = new GradientDrawable();
+        circleDrawable.setShape(GradientDrawable.OVAL);
+        circleDrawable.setColor(Color.parseColor(danhMuc.getMauSac()));
+        categoryIcon.setBackground(circleDrawable);
+        categoryIcon.setClipToOutline(true);
 
         TextView categoryName = new TextView(this);
         categoryName.setText(danhMuc.getTenDanhMuc());
@@ -288,16 +298,15 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     // Thêm view thẻ mới vào giao diện
     private void addCardView(String cardName) {
-        LinearLayout cardContainer = findViewById(R.id.card_container); // Giả sử bạn có LinearLayout với ID này
+        LinearLayout cardContainer = findViewById(R.id.card_container);
         Button addCardButton = findViewById(R.id.add_card_button);
 
         TextView cardTextView = new TextView(this);
         cardTextView.setText(cardName);
         cardTextView.setTextSize(16);
         cardTextView.setPadding(16, 16, 16, 16);
-        cardTextView.setBackgroundResource(R.drawable.card_background); // Giả sử bạn có drawable cho nền thẻ
+        cardTextView.setBackgroundResource(R.drawable.card_background);
 
-        // Thêm sự kiện click để thay đổi màu nền khi được chọn
         cardTextView.setOnClickListener(v -> {
             // Đặt lại màu nền cho tất cả các thẻ
             for (int i = 0; i < cardContainer.getChildCount(); i++) {
@@ -375,7 +384,10 @@ public class AddTransactionActivity extends AppCompatActivity {
             return;
         }
 
-        GiaoDich giaoDich = new GiaoDich(taiKhoanId, danhMucId, amount, currentDate, note, transactionType);
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        String formattedDate = dateFormat.format(currentDate);
+
+        GiaoDich giaoDich = new GiaoDich(taiKhoanId, danhMucId, amount, formattedDate, note, transactionType);
         viewModel.addTransaction(giaoDich);
 
         viewModel.getGiaoDich().observe(this, giaoDich1 -> {
@@ -421,7 +433,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 (view, year, month, dayOfMonth) -> {
                     calendar.set(year, month, dayOfMonth);
                     selectedDate = calendar.getTime();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
                     todayDate.setText(dateFormat.format(selectedDate));
                     highlightSelectedDate(todayDate);
                 },

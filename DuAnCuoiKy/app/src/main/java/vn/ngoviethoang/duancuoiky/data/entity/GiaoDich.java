@@ -1,17 +1,12 @@
+// GiaoDich.java
 package vn.ngoviethoang.duancuoiky.data.entity;
-
-import android.graphics.Bitmap;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverters;
 
 import java.io.Serializable;
-import java.util.Date;
-
-import vn.ngoviethoang.duancuoiky.data.database.DateConverter;
 
 @Entity(
         tableName = "giao_dich",
@@ -21,7 +16,6 @@ import vn.ngoviethoang.duancuoiky.data.database.DateConverter;
         },
         indices = {@Index("taiKhoanId"), @Index("danhMucId")}
 )
-@TypeConverters(DateConverter.class)
 public class GiaoDich implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public int id;
@@ -29,12 +23,12 @@ public class GiaoDich implements Serializable {
     public int taiKhoanId;  // Liên kết đến tài khoản
     public int danhMucId;   // Liên kết đến danh mục
     public double soTien;   // Số tiền
-    public Date ngay;       // Ngày giao dịch
+    public String ngay;     // Ngày giao dịch
     public String ghiChu;   // Ghi chú
     public String loai;     // Loại giao dịch: "thu_nhap" hoặc "chi_tieu"
 
     // Constructor
-    public GiaoDich(int taiKhoanId, int danhMucId, double soTien, Date ngay, String ghiChu, String loai) {
+    public GiaoDich(int taiKhoanId, int danhMucId, double soTien, String ngay, String ghiChu, String loai) {
         this.taiKhoanId = taiKhoanId;
         this.danhMucId = danhMucId;
         this.soTien = soTien;
@@ -76,11 +70,11 @@ public class GiaoDich implements Serializable {
         this.soTien = soTien;
     }
 
-    public Date getNgay() {
+    public String getNgay() {
         return ngay;
     }
 
-    public void setNgay(Date ngay) {
+    public void setNgay(String ngay) {
         this.ngay = ngay;
     }
 

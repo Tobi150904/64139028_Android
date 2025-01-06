@@ -3,6 +3,8 @@ package vn.ngoviethoang.duancuoiky.Ui.Category;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -94,10 +96,18 @@ public class CategoryActivity extends AppCompatActivity {
         categoryLayout.setPadding(20, 10, 20, 10);
         categoryLayout.setGravity(Gravity.CENTER);
 
+        // Tạo ImageView để hiển thị ảnh danh mục trong hình tròn
         ImageView categoryIcon = new ImageView(this);
         Bitmap bitmap = BitmapFactory.decodeByteArray(danhMuc.getIcon(), 0, danhMuc.getIcon().length);
         categoryIcon.setImageBitmap(bitmap);
         categoryIcon.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
+
+        // Tạo hình tròn cho ImageView
+        GradientDrawable circleDrawable = new GradientDrawable();
+        circleDrawable.setShape(GradientDrawable.OVAL);
+        circleDrawable.setColor(Color.parseColor(danhMuc.getMauSac())); // Đặt màu nền từ danhMuc
+        categoryIcon.setBackground(circleDrawable);
+        categoryIcon.setClipToOutline(true);
 
         TextView categoryName = new TextView(this);
         categoryName.setText(danhMuc.getTenDanhMuc());
