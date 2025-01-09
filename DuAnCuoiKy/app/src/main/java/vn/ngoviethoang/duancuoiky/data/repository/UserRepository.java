@@ -20,27 +20,15 @@ public class UserRepository {
         executorService = AppDatabase.databaseWriteExecutor;
     }
 
-    public void registerUser(User user, RepositoryCallback callback) {
-        executorService.execute(() -> {
-            try {
-                userDao.insertUser(user);
-                callback.onSuccess("Đăng ký thành công!");
-            } catch (Exception e) {
-                callback.onFailure(e.getMessage());
-            }
-        });
-    }
-
-    public LiveData<User> loginUser(String email, String password) {
+    public LiveData<User> getUserByEmailAndPassword(String email, String password) {
         return userDao.getUserByEmailAndPassword(email, password);
     }
 
-    public LiveData<User> checkUserExists(String email) {
+    public LiveData<User> getUserByEmail(String email) {
         return userDao.getUserByEmail(email);
     }
 
-    public interface RepositoryCallback {
-        void onSuccess(String message);
-        void onFailure(String errorMessage);
+    public void insertUser(User user) {
+        executorService.execute(() -> userDao.insertUser(user));
     }
 }

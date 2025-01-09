@@ -3,20 +3,16 @@ package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 import android.app.Application;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
 import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
@@ -29,7 +25,7 @@ public class DashboardViewModel extends AndroidViewModel {
     private final MutableLiveData<String> dateRange = new MutableLiveData<>();
     private final MutableLiveData<String> tabSelected = new MutableLiveData<>();
     private final MutableLiveData<List<TaiKhoan>> accounts = new MutableLiveData<>();
-    private final MutableLiveData<Double> totalBalance = new MutableLiveData<Double>();
+    private final MutableLiveData<Double> totalBalance = new MutableLiveData<>();
     private final MutableLiveData<List<GiaoDich>> transactions = new MutableLiveData<>();
 
     private final TaiKhoanRepository taiKhoanRepository;
@@ -45,10 +41,6 @@ public class DashboardViewModel extends AndroidViewModel {
         loadTransactions();
     }
 
-    public LiveData<Double> getTotalBalance() {
-        return totalBalance;
-    }
-
     public LiveData<String> getDateRange() {
         return dateRange;
     }
@@ -61,32 +53,59 @@ public class DashboardViewModel extends AndroidViewModel {
         return accounts;
     }
 
+    public LiveData<Double> getTotalBalance() {
+        return totalBalance;
+    }
+
     public LiveData<List<GiaoDich>> getTransactions() {
         return transactions;
     }
 
-    public void updateDateRange(String range) {
+    public void updateDateRange(String range, int direction) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Calendar calendar = Calendar.getInstance();
 
         switch (range) {
             case "day":
+                calendar.add(Calendar.DAY_OF_MONTH, direction); // Thêm hoặc bớt ngày
                 dateRange.setValue("Hôm nay: " + formatter.format(calendar.getTime()));
                 break;
             case "week":
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                calendar.add(Calendar.DAY_OF_WEEK, direction * 7); // Thêm hoặc bớt tuần
                 String weekStart = formatter.format(calendar.getTime());
                 calendar.add(Calendar.DAY_OF_WEEK, 6);
                 dateRange.setValue(weekStart + " - " + formatter.format(calendar.getTime()));
                 break;
             case "month":
+                calendar.add(Calendar.MONTH, direction); // Thêm hoặc bớt tháng
                 dateRange.setValue((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR));
                 break;
             case "year":
+                calendar.add(Calendar.YEAR, direction); // Thêm hoặc bớt năm
                 dateRange.setValue("Năm: " + calendar.get(Calendar.YEAR));
                 break;
             default:
                 dateRange.setValue("Chọn thời gian");
+                break;
+        }
+    }
+
+
+    public void navigateDateRange(int direction) {
+        String currentRange = dateRange.getValue();
+        if (currentRange != null) {
+            if (currentRange.contains("-")) {
+                updateDateRange("week", direction); // Xử lý tuần
+            } else if (currentRange.contains("/")) {
+                if (currentRange.length() == 10) {
+                    updateDateRange("day", direction); // Xử lý ngày
+                } else if (currentRange.length() == 7) {
+                    updateDateRange("month", direction); // Xử lý tháng
+                } else if (currentRange.length() == 4) {
+                    updateDateRange("year", direction); // Xử lý năm
+                }
+            }
         }
     }
 
@@ -99,15 +118,17 @@ public class DashboardViewModel extends AndroidViewModel {
     }
 
     public void initializeDashboard() {
-        updateDateRange("day");
+        updateDateRange("day", 0);
         switchTab("expenses");
     }
 
     public void loadAccounts() {
-        taiKhoanRepository.getAllTaiKhoan().observeForever(accounts -> {
-            this.accounts.setValue(accounts);
-            updateTotalBalance(accounts);
-        });
+        taiKhoanRepository.getAllTaiKhoan().observeForever(accounts::setValue);
+        taiKhoanRepository.getAllTaiKhoan().observeForever(this::updateTotalBalance);
+    }
+
+    public void loadTransactions() {
+        giaoDichRepository.getAllGiaoDich().observeForever(transactions::setValue);
     }
 
     private void updateTotalBalance(List<TaiKhoan> accounts) {
@@ -134,10 +155,6 @@ public class DashboardViewModel extends AndroidViewModel {
                 .orElse(null) : null;
     }
 
-    public void loadTransactions() {
-        giaoDichRepository.getAllGiaoDich().observeForever(transactions::setValue);
-    }
-
     public LiveData<DanhMuc> getCategoryById(int categoryId) {
         MutableLiveData<DanhMuc> danhMucLiveData = new MutableLiveData<>();
         danhMucRepository.getDanhMucById(categoryId, danhMucLiveData::setValue);
@@ -148,132 +165,65 @@ public class DashboardViewModel extends AndroidViewModel {
         danhMucRepository.getDanhMucById(categoryId, listener);
     }
 
-    public LiveData<List<GiaoDich>> getTransactionsByDateRange(String range) {
-        MutableLiveData<List<GiaoDich>> filteredTransactions = new MutableLiveData<>();
-        giaoDichRepository.getAllGiaoDich().observeForever(transactions -> {
-            filteredTransactions.setValue(filterTransactionsByDateRange(transactions, range));
-        });
-        return filteredTransactions;
-    }
-
-    private List<GiaoDich> filterTransactionsByDateRange(List<GiaoDich> transactions, String range) {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-        switch (range) {
-            case "day":
-                return filterTransactionsByDay(transactions, formatter.format(calendar.getTime()));
-            case "week":
-                return filterTransactionsByWeek(transactions, calendar, formatter);
-            case "month":
-                return filterTransactionsByMonth(transactions, calendar, formatter);
-            case "year":
-                return filterTransactionsByYear(transactions, calendar, formatter);
-            default:
-                return transactions;
-        }
-    }
-
-    private List<GiaoDich> filterTransactionsByDay(List<GiaoDich> transactions, String today) {
-        return transactions.stream()
-                .filter(transaction -> transaction.getNgay().equals(today))
-                .collect(Collectors.toList());
-    }
-
-    private List<GiaoDich> filterTransactionsByWeek(List<GiaoDich> transactions, Calendar calendar, SimpleDateFormat formatter) {
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        String weekStart = formatter.format(calendar.getTime());
-        calendar.add(Calendar.DAY_OF_WEEK, 6);
-        String weekEnd = formatter.format(calendar.getTime());
-        return transactions.stream()
-                .filter(transaction -> {
-                    String transactionDate = transaction.getNgay();
-                    return transactionDate.compareTo(weekStart) >= 0 && transactionDate.compareTo(weekEnd) <= 0;
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<GiaoDich> filterTransactionsByMonth(List<GiaoDich> transactions, Calendar calendar, SimpleDateFormat formatter) {
-        int month = calendar.get(Calendar.MONTH);
-        int year = calendar.get(Calendar.YEAR);
-        return transactions.stream()
-                .filter(transaction -> {
-                    try {
-                        Date transactionDate = formatter.parse(transaction.getNgay());
-                        Calendar transactionCalendar = Calendar.getInstance();
-                        transactionCalendar.setTime(transactionDate);
-                        return transactionCalendar.get(Calendar.MONTH) == month && transactionCalendar.get(Calendar.YEAR) == year;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return false;
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<GiaoDich> filterTransactionsByYear(List<GiaoDich> transactions, Calendar calendar, SimpleDateFormat formatter) {
-        int currentYear = calendar.get(Calendar.YEAR);
-        return transactions.stream()
-                .filter(transaction -> {
-                    try {
-                        Date transactionDate = formatter.parse(transaction.getNgay());
-                        Calendar transactionCalendar = Calendar.getInstance();
-                        transactionCalendar.setTime(transactionDate);
-                        return transactionCalendar.get(Calendar.YEAR) == currentYear;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return false;
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
     public LiveData<List<GiaoDich>> getFilteredTransactions(String loai, String range) {
         MutableLiveData<List<GiaoDich>> filteredTransactions = new MutableLiveData<>();
         giaoDichRepository.getAllGiaoDich().observeForever(transactions -> {
-            List<GiaoDich> filteredList = transactions.stream()
-                    .filter(transaction -> transaction.getLoai().equals(loai))
-                    .filter(transaction -> filterByDate(transaction, range))
-                    .collect(Collectors.toList());
-            filteredTransactions.setValue(filteredList);
+            filteredTransactions.setValue(filterTransactions(transactions, range, loai));
         });
         return filteredTransactions;
     }
 
-    private boolean filterByDate(GiaoDich transaction, String range) {
-        try {
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-            Date transactionDate = formatter.parse(transaction.getNgay());
-            Calendar calendar = Calendar.getInstance();
+    private List<GiaoDich> filterTransactions(List<GiaoDich> transactions, String range, String loai) {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-            switch (range) {
-                case "day":
-                    boolean isSameDay = formatter.format(transactionDate).equals(formatter.format(calendar.getTime()));
-                    return isSameDay;
-                case "week":
-                    calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                    Date weekStart = calendar.getTime();
-                    calendar.add(Calendar.DAY_OF_WEEK, 6);
-                    Date weekEnd = calendar.getTime();
-                    boolean isInWeek = !transactionDate.before(weekStart) && !transactionDate.after(weekEnd);
-                    return isInWeek;
-                case "month":
-                    Calendar transactionCalendar = Calendar.getInstance();
-                    transactionCalendar.setTime(transactionDate);
-                    boolean isSameMonth = transactionCalendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) &&
-                            transactionCalendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR);
-                    return isSameMonth;
-                case "year":
-                    Calendar transactionCalendarYear = Calendar.getInstance();
-                    transactionCalendarYear.setTime(transactionDate);
-                    boolean isSameYear = transactionCalendarYear.get(Calendar.YEAR) == calendar.get(Calendar.YEAR);
-                    return isSameYear;
-                default:
-                    return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return transactions.stream()
+                .filter(transaction -> loai == null || transaction.getLoai().equals(loai))
+                .filter(transaction -> {
+                    try {
+                        Date transactionDate = formatter.parse(transaction.getNgay());
+                        Calendar transactionCalendar = Calendar.getInstance();
+                        transactionCalendar.setTime(transactionDate);
+
+                        switch (range) {
+                            case "day":
+                                return isSameDay(transactionCalendar, calendar);
+                            case "week":
+                                return isSameWeek(transactionCalendar, calendar);
+                            case "month":
+                                return isSameMonth(transactionCalendar, calendar);
+                            case "year":
+                                return isSameYear(transactionCalendar, calendar);
+                            default:
+                                return true;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
     }
+
+    private boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
+                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
+    }
+
+    private boolean isSameWeek(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    private boolean isSameMonth(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH);
+    }
+
+    private boolean isSameYear(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+    }
+
+
 }

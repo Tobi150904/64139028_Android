@@ -65,20 +65,14 @@ public class LoginActivity extends AppCompatActivity {
             passwordInputLayout.setError(null);
         }
 
-        userRepository.checkUserExists(email).observe(this, existingUser -> {
-            if (existingUser == null) {
-                Toast.makeText(LoginActivity.this, "Tài khoản chưa được đăng ký", Toast.LENGTH_SHORT).show();
+        userRepository.getUserByEmailAndPassword(email, password).observe(this, user -> {
+            if (user != null) {
+                Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                intent.putExtra("USER_ID", user.getId());
+                startActivity(intent);
+                finish();
             } else {
-                userRepository.loginUser(email, password).observe(this, user -> {
-                    if (user != null) {
-                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                        intent.putExtra("USER_ID", user.getId());
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Mật khẩu sai", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Toast.makeText(LoginActivity.this, "Sai email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
             }
         });
     }

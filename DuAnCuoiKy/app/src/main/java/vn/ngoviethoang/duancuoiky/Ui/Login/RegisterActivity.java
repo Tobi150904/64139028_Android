@@ -71,30 +71,17 @@ public class RegisterActivity extends AppCompatActivity {
             confirmPasswordInputLayout.setError(null);
         }
 
-        userRepository.checkUserExists(email).observe(this, existingUser -> {
-            if (existingUser != null) {
+        userRepository.getUserByEmail(email).observe(this, user -> {
+            if (user != null) {
                 emailInputLayout.setError("Email đã được sử dụng");
             } else {
-                User user = new User();
-                user.setEmail(email);
-                user.setPassword(password);
+                User newUser = new User();
+                newUser.setEmail(email);
+                newUser.setPassword(password);
 
-                userRepository.registerUser(user, new UserRepository.RepositoryCallback() {
-                    @Override
-                    public void onSuccess(String message) {
-                        runOnUiThread(() -> {
-                            Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-                            finish();
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(String errorMessage) {
-                        runOnUiThread(() ->
-                                Toast.makeText(RegisterActivity.this, "Lỗi: " + errorMessage, Toast.LENGTH_SHORT).show()
-                        );
-                    }
-                });
+                userRepository.insertUser(newUser);
+                Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }

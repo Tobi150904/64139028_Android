@@ -39,7 +39,7 @@ import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 public class DashboardActivity extends AppCompatActivity {
     private DashboardViewModel dashboardViewModel;
     private TextView totalBalanceAmount, dateRange, tabExpenses, tabIncome, tabDay, tabWeek, tabMonth, tabYear, tabCustom;
-    private ImageView iconMenu, iconList, iconAdd, iconEditBalance, iconDown;
+    private ImageView iconMenu, iconList, iconAdd, iconEditBalance, iconDown, iconPrevious, iconNext;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private int userId;
@@ -68,6 +68,8 @@ public class DashboardActivity extends AppCompatActivity {
         iconAdd = findViewById(R.id.icon_add_transaction);
         iconEditBalance = findViewById(R.id.icon_edit_balance);
         iconDown = findViewById(R.id.icon_down);
+        iconPrevious = findViewById(R.id.icon_previous);
+        iconNext = findViewById(R.id.icon_next);
         tabExpenses = findViewById(R.id.tab_expenses);
         tabIncome = findViewById(R.id.tab_income);
         tabDay = findViewById(R.id.tab_day);
@@ -87,42 +89,62 @@ public class DashboardActivity extends AppCompatActivity {
         dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,.2f VND", balance)));
         dashboardViewModel.getTransactions().observe(this, this::updateTransactionUI);
     }
-
+    private String currentTab = "expenses";
     private void setupListeners() {
         iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(navigationView));
         iconList.setOnClickListener(v -> startActivity(new Intent(this, TransactionDetailActivity.class)));
         iconAdd.setOnClickListener(v -> startActivity(new Intent(this, AddTransactionActivity.class)));
         iconEditBalance.setOnClickListener(v -> showEditBalanceDialog());
         iconDown.setOnClickListener(v -> showAccountsDialog());
+        iconPrevious.setOnClickListener(v -> navigateDateRange(-1));
+        iconNext.setOnClickListener(v -> navigateDateRange(1));
 
         tabExpenses.setOnClickListener(v -> {
             selectTab(tabExpenses, "expenses");
+            currentTab = "expenses";
             updateFilteredTransactions("chi_phi", dashboardViewModel.getDateRange().getValue());
         });
 
         tabIncome.setOnClickListener(v -> {
             selectTab(tabIncome, "income");
+            currentTab = "income";
             updateFilteredTransactions("thu_nhap", dashboardViewModel.getDateRange().getValue());
         });
 
         tabDay.setOnClickListener(v -> {
             selectDateRangeTab(tabDay, "day");
-            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "day");
+            if (currentTab.equals("expenses")) {
+                updateFilteredTransactions("chi_phi", "day");
+            } else {
+                updateFilteredTransactions("thu_nhap", "day");
+            }
         });
 
         tabWeek.setOnClickListener(v -> {
             selectDateRangeTab(tabWeek, "week");
-            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "week");
+            if (currentTab.equals("expenses")) {
+                updateFilteredTransactions("chi_phi", "week");
+            } else {
+                updateFilteredTransactions("thu_nhap", "week");
+            }
         });
 
         tabMonth.setOnClickListener(v -> {
             selectDateRangeTab(tabMonth, "month");
-            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "month");
+            if (currentTab.equals("expenses")) {
+                updateFilteredTransactions("chi_phi", "month");
+            } else {
+                updateFilteredTransactions("thu_nhap", "month");
+            }
         });
 
         tabYear.setOnClickListener(v -> {
             selectDateRangeTab(tabYear, "year");
-            updateFilteredTransactions(dashboardViewModel.getTabSelected().getValue(), "year");
+            if (currentTab.equals("expenses")) {
+                updateFilteredTransactions("chi_phi", "year");
+            } else {
+                updateFilteredTransactions("thu_nhap", "year");
+            }
         });
 
         tabCustom.setOnClickListener(v -> showDatePickerDialog());
@@ -193,6 +215,10 @@ public class DashboardActivity extends AppCompatActivity {
         tab.setTextColor(getResources().getColor(R.color.Red));
         tab.setTypeface(null, Typeface.BOLD);
         tab.setPaintFlags(tab.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+    }
+
+    private void navigateDateRange(int direction) {
+        dashboardViewModel.navigateDateRange(direction);
     }
 
     private void updateFilteredTransactions(String loai, String range) {
