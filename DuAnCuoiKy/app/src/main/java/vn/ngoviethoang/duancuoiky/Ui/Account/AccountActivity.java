@@ -38,6 +38,7 @@ public class AccountActivity extends AppCompatActivity {
         totalBalance = findViewById(R.id.total_balance);
         accountsContainer = findViewById(R.id.accounts_container);
         ImageView addAccountButton = findViewById(R.id.ic_add);
+        ImageView transactionTransfer = findViewById(R.id.ic_transaction_transfer);
         navigationView = findViewById(R.id.nav_view);
         iconMenu = findViewById(R.id.ic_menu);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -51,6 +52,7 @@ public class AccountActivity extends AppCompatActivity {
         viewModel.getAccounts().observe(this, this::updateAccountsUI);
 
         addAccountButton.setOnClickListener(v -> startActivity(new Intent(this, AddAccountActivity.class)));
+        transactionTransfer.setOnClickListener(v -> startActivity(new Intent(this, AddTransferActivity.class)));
 
         viewModel.loadAccounts();
 

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
@@ -54,7 +55,7 @@ public class AddAccountActivity extends AppCompatActivity {
             selectedIconBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
             byte[] iconBytes = outputStream.toByteArray();
 
-            TaiKhoan newAccount = new TaiKhoan(accountName, amount, iconBytes);
+            TaiKhoan newAccount = new TaiKhoan(accountName, amount, iconBytes, new Date());
             viewModel.addAccount(newAccount);
 
             Toast.makeText(this, "Tài khoản đã được thêm!", Toast.LENGTH_SHORT).show();

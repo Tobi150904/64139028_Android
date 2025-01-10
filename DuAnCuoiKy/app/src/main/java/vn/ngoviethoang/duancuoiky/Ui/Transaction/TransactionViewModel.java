@@ -43,7 +43,7 @@ public class TransactionViewModel extends AndroidViewModel {
         errorMessage = new MutableLiveData<>();
         dateRange = new MutableLiveData<>();
         accounts = taiKhoanRepository.getAllTaiKhoan();
-        currentCalendar = Calendar.getInstance(); // Khởi tạo với thời gian hiện tại
+        currentCalendar = Calendar.getInstance();
         giaoDichList = new MutableLiveData<>();
         loadTransactions();
     }

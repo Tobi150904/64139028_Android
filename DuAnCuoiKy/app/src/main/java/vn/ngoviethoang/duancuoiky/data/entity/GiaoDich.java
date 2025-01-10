@@ -37,6 +37,17 @@ public class GiaoDich implements Serializable {
         this.loai = loai;
     }
 
+    // Constructor sao chép
+    public GiaoDich(GiaoDich other) {
+        this.id = other.id;
+        this.taiKhoanId = other.taiKhoanId;
+        this.danhMucId = other.danhMucId;
+        this.soTien = other.soTien;
+        this.ngay = other.ngay;
+        this.ghiChu = other.ghiChu;
+        this.loai = other.loai;
+    }
+
     // Getters and setters
     public int getId() {
         return id;

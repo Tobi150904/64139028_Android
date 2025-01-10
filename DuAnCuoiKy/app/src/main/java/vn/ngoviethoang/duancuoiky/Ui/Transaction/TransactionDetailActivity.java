@@ -49,10 +49,8 @@ public class TransactionDetailActivity extends AppCompatActivity {
 
         setupListeners();
 
-        // Observe dateRange LiveData
         transactionViewModel.getDateRange().observe(this, date -> dateRange.setText(date));
 
-        // Set default tabs and observe transaction list LiveData
         selectTab(tabExpenses, "chi_phi");
         selectDateRangeTab(tabDay, "day");
     }

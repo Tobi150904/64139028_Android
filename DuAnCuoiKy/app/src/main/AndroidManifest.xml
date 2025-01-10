@@ -38,7 +38,12 @@
         <activity android:name=".Ui.Account.AccountActivity"
             android:exported="true">
         </activity>
-
+        <activity android:name=".Ui.Account.TransferActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".Ui.Account.AddTransferActivity"
+            android:exported="true">
+        </activity>
         <activity android:name=".Ui.Category.CategoryActivity"
             android:exported="true">
         </activity>

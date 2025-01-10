@@ -236,7 +236,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         categoryIcon.setImageBitmap(bitmap);
         categoryIcon.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
 
-        // Tạo hình tròn cho ImageView
+        // Tạo ImageView để hiển thị ảnh danh mục trong hình tròn
         GradientDrawable circleDrawable = new GradientDrawable();
         circleDrawable.setShape(GradientDrawable.OVAL);
         circleDrawable.setColor(Color.parseColor(danhMuc.getMauSac()));

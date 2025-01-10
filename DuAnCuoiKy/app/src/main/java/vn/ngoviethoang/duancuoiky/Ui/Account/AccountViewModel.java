@@ -1,4 +1,3 @@
-// AccountViewModel.java
 package vn.ngoviethoang.duancuoiky.Ui.Account;
 
 import android.app.Application;
@@ -51,5 +50,10 @@ public class AccountViewModel extends AndroidViewModel {
 
     public LiveData<TaiKhoan> getTaiKhoanById(int id) {
         return repository.getTaiKhoanById(id);
+    }
+
+    public void updateAccount(TaiKhoan account) {
+        repository.updateTaiKhoan(account);
+        loadAccounts();
     }
 }

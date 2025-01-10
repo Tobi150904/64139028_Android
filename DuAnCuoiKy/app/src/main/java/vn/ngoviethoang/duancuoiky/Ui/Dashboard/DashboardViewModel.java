@@ -8,7 +8,9 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,8 +34,11 @@ public class DashboardViewModel extends AndroidViewModel {
     private final GiaoDichRepository giaoDichRepository;
     private final DanhMucRepository danhMucRepository;
 
+    private Calendar currentCalendar;
+
     public DashboardViewModel(@NonNull Application application) {
         super(application);
+        currentCalendar = Calendar.getInstance();
         taiKhoanRepository = new TaiKhoanRepository(application);
         giaoDichRepository = new GiaoDichRepository(application);
         danhMucRepository = new DanhMucRepository(application);
@@ -62,51 +67,160 @@ public class DashboardViewModel extends AndroidViewModel {
     }
 
     public void updateDateRange(String range, int direction) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat formatter;
 
         switch (range) {
             case "day":
-                calendar.add(Calendar.DAY_OF_MONTH, direction); // Thêm hoặc bớt ngày
-                dateRange.setValue("Hôm nay: " + formatter.format(calendar.getTime()));
+                formatter = new SimpleDateFormat("dd/MM/yyyy");
+                currentCalendar.add(Calendar.DATE, direction); // Tăng/giảm 1 ngày
+                dateRange.setValue(formatter.format(currentCalendar.getTime()));
                 break;
             case "week":
-                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                calendar.add(Calendar.DAY_OF_WEEK, direction * 7); // Thêm hoặc bớt tuần
-                String weekStart = formatter.format(calendar.getTime());
-                calendar.add(Calendar.DAY_OF_WEEK, 6);
-                dateRange.setValue(weekStart + " - " + formatter.format(calendar.getTime()));
+                formatter = new SimpleDateFormat("dd/MM/yyyy");
+                currentCalendar.add(Calendar.WEEK_OF_YEAR, direction); // Tăng/giảm 1 tuần
+                currentCalendar.set(Calendar.DAY_OF_WEEK, currentCalendar.getFirstDayOfWeek());
+                String startOfWeek = formatter.format(currentCalendar.getTime());
+                currentCalendar.add(Calendar.DATE, 6);
+                String endOfWeek = formatter.format(currentCalendar.getTime());
+                dateRange.setValue(startOfWeek + " - " + endOfWeek);
                 break;
             case "month":
-                calendar.add(Calendar.MONTH, direction); // Thêm hoặc bớt tháng
-                dateRange.setValue((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR));
+                formatter = new SimpleDateFormat("MM/yyyy");
+                currentCalendar.add(Calendar.MONTH, direction); // Tăng/giảm 1 tháng
+                dateRange.setValue(formatter.format(currentCalendar.getTime()));
                 break;
             case "year":
-                calendar.add(Calendar.YEAR, direction); // Thêm hoặc bớt năm
-                dateRange.setValue("Năm: " + calendar.get(Calendar.YEAR));
-                break;
-            default:
-                dateRange.setValue("Chọn thời gian");
+                formatter = new SimpleDateFormat("yyyy");
+                currentCalendar.add(Calendar.YEAR, direction); // Tăng/giảm 1 năm
+                dateRange.setValue(String.valueOf(currentCalendar.get(Calendar.YEAR)));
                 break;
         }
     }
-
 
     public void navigateDateRange(int direction) {
         String currentRange = dateRange.getValue();
         if (currentRange != null) {
             if (currentRange.contains("-")) {
-                updateDateRange("week", direction); // Xử lý tuần
+                updateDateRange("week", direction);
             } else if (currentRange.contains("/")) {
                 if (currentRange.length() == 10) {
-                    updateDateRange("day", direction); // Xử lý ngày
+                    updateDateRange("day", direction);
                 } else if (currentRange.length() == 7) {
-                    updateDateRange("month", direction); // Xử lý tháng
-                } else if (currentRange.length() == 4) {
-                    updateDateRange("year", direction); // Xử lý năm
+                    updateDateRange("month", direction);
                 }
+            } else if (currentRange.length() == 4) {
+                updateDateRange("year", direction);
             }
         }
+    }
+
+    public LiveData<List<GiaoDich>> getFilteredTransactions(String loai, String range) {
+        MutableLiveData<List<GiaoDich>> filteredTransactions = new MutableLiveData<>();
+
+        giaoDichRepository.getAllGiaoDich().observeForever(transactions -> {
+            List<GiaoDich> filtered = new ArrayList<>();
+            SimpleDateFormat formatter;
+
+            if (range.contains("-")) {
+                // Lọc giao dịch theo tuần
+                String[] dates = range.split(" - ");
+                formatter = new SimpleDateFormat("dd/MM/yyyy");
+                try {
+                    Date startDate = formatter.parse(dates[0]);
+                    Date endDate = formatter.parse(dates[1]);
+
+                    for (GiaoDich transaction : transactions) {
+                        if (transaction.getLoai().equals(loai)) {
+                            Date transactionDate = formatter.parse(transaction.getNgay());
+                            if ((transactionDate.after(startDate) && transactionDate.before(endDate)) || transactionDate.equals(startDate) || transactionDate.equals(endDate)) {
+                                filtered.add(transaction);
+                            }
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            } else if (range.contains("/")) {
+            // Lọc giao dịch theo ngày hoặc tháng
+            if (range.length() == 10) {
+                // Lọc theo ngày
+                formatter = new SimpleDateFormat("dd/MM/yyyy");
+                try {
+                    Date rangeDate = formatter.parse(range);
+                    if (rangeDate != null) {
+                        for (GiaoDich transaction : transactions) {
+                            if (transaction.getLoai().equals(loai)) {
+                                Date transactionDate = formatter.parse(transaction.getNgay());
+                                if (transactionDate != null && transactionDate.equals(rangeDate)) {
+                                    filtered.add(transaction);
+                                }
+                            }
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            } else if (range.length() == 7) {
+                // Lọc theo tháng
+                formatter = new SimpleDateFormat("MM/yyyy");
+                try {
+                    Date rangeDate = formatter.parse(range);
+                    if (rangeDate != null) {
+                        Calendar rangeCalendar = Calendar.getInstance();
+                        rangeCalendar.setTime(rangeDate);
+
+                        for (GiaoDich transaction : transactions) {
+                            if (transaction.getLoai().equals(loai)) {
+                                Date transactionDate = formatter.parse(transaction.getNgay());
+                                if (transactionDate != null) {
+                                    Calendar transactionCalendar = Calendar.getInstance();
+                                    transactionCalendar.setTime(transactionDate);
+
+                                    // So sánh tháng và năm
+                                    if (transactionCalendar.get(Calendar.MONTH) == rangeCalendar.get(Calendar.MONTH) &&
+                                            transactionCalendar.get(Calendar.YEAR) == rangeCalendar.get(Calendar.YEAR)) {
+                                        filtered.add(transaction);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (range.length() == 4) {
+            // Lọc giao dịch theo năm
+            formatter = new SimpleDateFormat("yyyy");
+            try {
+                Date rangeDate = formatter.parse(range);
+                if (rangeDate != null) {
+                    Calendar rangeCalendar = Calendar.getInstance();
+                    rangeCalendar.setTime(rangeDate);
+
+                    for (GiaoDich transaction : transactions) {
+                        if (transaction.getLoai().equals(loai)) {
+                            Date transactionDate = formatter.parse(transaction.getNgay());
+                            if (transactionDate != null) {
+                                Calendar transactionCalendar = Calendar.getInstance();
+                                transactionCalendar.setTime(transactionDate);
+
+                                // So sánh năm
+                                if (transactionCalendar.get(Calendar.YEAR) == rangeCalendar.get(Calendar.YEAR)) {
+                                    filtered.add(transaction);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+            filteredTransactions.setValue(filtered);
+        });
+
+        return filteredTransactions;
     }
 
     public void updateCustomDateRange(String start, String end) {
@@ -141,13 +255,6 @@ public class DashboardViewModel extends AndroidViewModel {
         loadAccounts();
     }
 
-    public byte[] getAccountIconBytes() {
-        Bitmap bitmap = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.ic_account1);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-        return outputStream.toByteArray();
-    }
-
     public TaiKhoan getAccountByName(String accountName) {
         return accounts.getValue() != null ? accounts.getValue().stream()
                 .filter(account -> account.getTen().equals(accountName))
@@ -164,66 +271,4 @@ public class DashboardViewModel extends AndroidViewModel {
     public void getCategoryIconById(int categoryId, DanhMucRepository.OnDanhMucLoadedListener listener) {
         danhMucRepository.getDanhMucById(categoryId, listener);
     }
-
-    public LiveData<List<GiaoDich>> getFilteredTransactions(String loai, String range) {
-        MutableLiveData<List<GiaoDich>> filteredTransactions = new MutableLiveData<>();
-        giaoDichRepository.getAllGiaoDich().observeForever(transactions -> {
-            filteredTransactions.setValue(filterTransactions(transactions, range, loai));
-        });
-        return filteredTransactions;
-    }
-
-    private List<GiaoDich> filterTransactions(List<GiaoDich> transactions, String range, String loai) {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-        return transactions.stream()
-                .filter(transaction -> loai == null || transaction.getLoai().equals(loai))
-                .filter(transaction -> {
-                    try {
-                        Date transactionDate = formatter.parse(transaction.getNgay());
-                        Calendar transactionCalendar = Calendar.getInstance();
-                        transactionCalendar.setTime(transactionDate);
-
-                        switch (range) {
-                            case "day":
-                                return isSameDay(transactionCalendar, calendar);
-                            case "week":
-                                return isSameWeek(transactionCalendar, calendar);
-                            case "month":
-                                return isSameMonth(transactionCalendar, calendar);
-                            case "year":
-                                return isSameYear(transactionCalendar, calendar);
-                            default:
-                                return true;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return false;
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    private boolean isSameDay(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
-                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
-    }
-
-    private boolean isSameWeek(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR);
-    }
-
-    private boolean isSameMonth(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH);
-    }
-
-    private boolean isSameYear(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
-    }
-
-
 }

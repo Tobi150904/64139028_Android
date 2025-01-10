@@ -107,7 +107,7 @@
                     android:orientation="vertical">
 
                     <ImageView
-                        android:id="@+id/ic_transaction_history"
+                        android:id="@+id/ic_transaction_transfer"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_marginBottom="8dp"

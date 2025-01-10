@@ -5,8 +5,10 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -22,15 +24,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.navigation.NavigationView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.Ui.Account.AccountActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Category.CategoryActivity;
+import vn.ngoviethoang.duancuoiky.Ui.Components.PieChartComponent;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.AddTransactionActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
 import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
@@ -43,6 +54,7 @@ public class DashboardActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private int userId;
+    private PieChart pieChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +68,15 @@ public class DashboardActivity extends AppCompatActivity {
 
         GiaoDich newTransaction = (GiaoDich) getIntent().getSerializableExtra("NEW_TRANSACTION");
         if (newTransaction != null) {
-            addTransactionToUI(newTransaction);
+            List<GiaoDich> currentTransactions = dashboardViewModel.getTransactions().getValue();
+            if (currentTransactions == null) {
+                currentTransactions = new ArrayList<>();
+            }
+
+            double totalAmount = currentTransactions.stream().mapToDouble(GiaoDich::getSoTien).sum();
+            currentTransactions.add(newTransaction);
+            totalAmount += newTransaction.getSoTien();
+            addTransactionToUI(newTransaction, totalAmount);
         }
     }
 
@@ -79,6 +99,108 @@ public class DashboardActivity extends AppCompatActivity {
         tabCustom = findViewById(R.id.tab_custom);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+
+        pieChart = findViewById(R.id.pieChart);
+        setupPieChart();
+    }
+
+    private void setupPieChart() {
+        pieChart.setUsePercentValues(true); // Hiển thị giá trị phần trăm
+        pieChart.getDescription().setEnabled(false); // Tắt mô tả
+        pieChart.setExtraOffsets(5, 10, 5, 10); // Đặt lề
+        pieChart.setDragDecelerationFrictionCoef(0.95f); // Độ trượt
+        pieChart.setDrawHoleEnabled(true); // Cho phép vẽ lỗ ở giữa
+        pieChart.setHoleColor(Color.WHITE); // Màu lỗ
+        pieChart.setTransparentCircleColor(Color.WHITE); // Màu vòng tròn trong suốt
+        pieChart.setTransparentCircleAlpha(110); // Độ trong suốt
+        pieChart.setHoleRadius(58f); // Bán kính lỗ
+        pieChart.setTransparentCircleRadius(61f); // Bán kính vòng tròn trong suốt
+        pieChart.setDrawCenterText(true); // Cho phép vẽ văn bản ở giữa
+        pieChart.setRotationAngle(0); // Góc xoay
+        pieChart.setRotationEnabled(true); // Cho phép xoay
+        pieChart.setHighlightPerTapEnabled(true); // Cho phép highlight khi chạm
+
+        // Tắt hiển thị nhãn (labels) và giá trị (values) bên trong biểu đồ
+        pieChart.setDrawEntryLabels(false); // Tắt nhãn bên trong biểu đồ
+
+        // Thiết lập đường kẻ từ nhãn đến phần biểu đồ
+        PieDataSet dataSet = new PieDataSet(new ArrayList<>(), ""); // Tạo một dataset rỗng để thiết lập thuộc tính
+        dataSet.setValueLinePart1Length(0.4f); // Độ dài phần đầu của đường kẻ
+        dataSet.setValueLinePart2Length(0.4f); // Độ dài phần thứ hai của đường kẻ
+        dataSet.setValueLineColor(Color.BLACK); // Màu đường kẻ
+        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE); // Hiển thị giá trị bên ngoài biểu đồ
+        dataSet.setValueLinePart1OffsetPercentage(80f); // Đặt khoảng cách từ phần biểu đồ đến đường kẻ
+        dataSet.setValueLineVariableLength(true); // Cho phép đường kẻ có độ dài thay đổi
+
+        // Gán dataset vào biểu đồ
+        PieData pieData = new PieData(dataSet);
+        pieChart.setData(pieData);
+    }
+
+    private void updatePieChart(List<GiaoDich> transactions) {
+        if (transactions == null || transactions.isEmpty()) {
+            // Nếu không có giao dịch, hiển thị biểu đồ với một phần tử duy nhất
+            List<PieEntry> entries = new ArrayList<>();
+            entries.add(new PieEntry(100f, "Không có giao dịch")); // Phần tử duy nhất chiếm 100%
+
+            // Tạo dataset cho biểu đồ
+            PieDataSet dataSet = new PieDataSet(entries, "");
+            dataSet.setColors(Color.GRAY); // Màu xám mặc định
+            dataSet.setValueTextSize(12f); // Kích thước giá trị
+            dataSet.setValueTextColor(Color.WHITE); // Màu giá trị
+
+            // Tạo đối tượng PieData và gán vào biểu đồ
+            PieData pieData = new PieData(dataSet);
+            pieChart.setData(pieData);
+            pieChart.setCenterText("Không có giao dịch"); // Hiển thị thông báo ở giữa
+            pieChart.invalidate(); // Vẽ lại biểu đồ
+            return;
+        }
+
+        // Tạo danh sách các mục (entries) cho biểu đồ
+        List<PieEntry> entries = new ArrayList<>();
+        double totalAmount = transactions.stream().mapToDouble(GiaoDich::getSoTien).sum();
+
+        // Danh sách màu sắc tương ứng với từng danh mục
+        List<Integer> colors = new ArrayList<>();
+
+        for (GiaoDich transaction : transactions) {
+            dashboardViewModel.getCategoryById(transaction.getDanhMucId()).observe(this, danhMuc -> {
+                if (danhMuc != null) {
+                    float percentage = (float) ((transaction.getSoTien() / totalAmount) * 100);
+                    entries.add(new PieEntry(percentage, danhMuc.getTenDanhMuc() + " " + String.format("%.1f%%", percentage)));
+
+                    // Lấy màu từ danh mục và thêm vào danh sách màu sắc
+                    int color = Color.parseColor(danhMuc.getMauSac());
+                    colors.add(color);
+                } else {
+                    entries.add(new PieEntry((float) ((transaction.getSoTien() / totalAmount) * 100), "Unknown"));
+                    colors.add(Color.GRAY); // Màu mặc định nếu không có danh mục
+                }
+
+                // Tạo dataset cho biểu đồ
+                PieDataSet dataSet = new PieDataSet(entries, "");
+                dataSet.setColors(colors); // Sử dụng màu từ danh mục
+                dataSet.setValueTextSize(12f); // Kích thước giá trị
+                dataSet.setValueTextColor(Color.BLACK); // Màu giá trị
+                dataSet.setValueTypeface(Typeface.DEFAULT_BOLD); // Đặt kiểu chữ in đậm
+                dataSet.setValueLinePart1Length(0.4f); // Độ dài phần đầu của đường kẻ
+                dataSet.setValueLinePart2Length(0.4f); // Độ dài phần thứ hai của đường kẻ
+                dataSet.setValueLineColor(Color.BLACK); // Màu đường kẻ
+                dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE); // Hiển thị giá trị bên ngoài biểu đồ
+                dataSet.setValueLinePart1OffsetPercentage(80f); // Đặt khoảng cách từ phần biểu đồ đến đường kẻ
+                dataSet.setValueLineVariableLength(true); // Cho phép đường kẻ có độ dài thay đổi
+
+                // Tắt hiển thị giá trị (phần trăm) bên trong biểu đồ
+                dataSet.setDrawValues(false); // Tắt giá trị bên trong biểu đồ
+
+                // Tạo đối tượng PieData và gán vào biểu đồ
+                PieData pieData = new PieData(dataSet);
+                pieChart.setData(pieData);
+                pieChart.setCenterText(String.format("%,.0f đ", totalAmount)); // Hiển thị tổng số tiền
+                pieChart.invalidate(); // Vẽ lại biểu đồ
+            });
+        }
     }
 
     private void setupViewModel() {
@@ -89,6 +211,7 @@ public class DashboardActivity extends AppCompatActivity {
         dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,.2f VND", balance)));
         dashboardViewModel.getTransactions().observe(this, this::updateTransactionUI);
     }
+
     private String currentTab = "expenses";
     private void setupListeners() {
         iconMenu.setOnClickListener(v -> drawerLayout.openDrawer(navigationView));
@@ -194,7 +317,9 @@ public class DashboardActivity extends AppCompatActivity {
         resetTab(tabCustom);
 
         highlightTab(selectedTab);
-        dashboardViewModel.updateDateRange(range);
+        dashboardViewModel.updateDateRange(range, 0);
+        String dateRange = dashboardViewModel.getDateRange().getValue();
+        updateFilteredTransactions(currentTab.equals("expenses") ? "chi_phi" : "thu_nhap", dateRange);
     }
 
     private void selectTab(TextView selectedTab, String tab) {
@@ -219,10 +344,18 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void navigateDateRange(int direction) {
         dashboardViewModel.navigateDateRange(direction);
+        String dateRange = dashboardViewModel.getDateRange().getValue();
+        if (currentTab.equals("expenses")) {
+            updateFilteredTransactions("chi_phi", dateRange);
+        } else {
+            updateFilteredTransactions("thu_nhap", dateRange);
+        }
     }
 
     private void updateFilteredTransactions(String loai, String range) {
-        dashboardViewModel.getFilteredTransactions(loai, range).observe(this, this::updateTransactionUI);
+        dashboardViewModel.getFilteredTransactions(loai, range).observe(this, transactions -> {
+            updateTransactionUI(transactions);
+        });
     }
 
     private void updateMainUI(String accountName, double balance) {
@@ -431,28 +564,57 @@ public class DashboardActivity extends AppCompatActivity {
         LinearLayout transactionContainer = findViewById(R.id.transaction_list);
         transactionContainer.removeAllViews();
 
+        // Gộp các giao dịch giống nhau dựa trên danh mục
+        Map<Integer, GiaoDich> mergedTransactions = new HashMap<>();
+        double totalAmount = 0;
+
         for (GiaoDich transaction : transactions) {
-            addTransactionToUI(transaction);
+            int danhMucId = transaction.getDanhMucId();
+            if (mergedTransactions.containsKey(danhMucId)) {
+                // Nếu đã có giao dịch cùng danh mục, cộng dồn số tiền
+                GiaoDich existingTransaction = mergedTransactions.get(danhMucId);
+                existingTransaction.setSoTien(existingTransaction.getSoTien() + transaction.getSoTien());
+            } else {
+                // Nếu chưa có, thêm giao dịch vào map
+                mergedTransactions.put(danhMucId, new GiaoDich(transaction));
+            }
+            totalAmount += transaction.getSoTien();
         }
+
+        // Hiển thị các giao dịch đã gộp
+        for (GiaoDich mergedTransaction : mergedTransactions.values()) {
+            addTransactionToUI(mergedTransaction, totalAmount);
+        }
+
+        // Cập nhật biểu đồ với các giao dịch đã gộp
+        updatePieChart(new ArrayList<>(mergedTransactions.values()));
     }
 
-    private void addTransactionToUI(GiaoDich transaction) {
+    private void addTransactionToUI(GiaoDich transaction, double totalAmount) {
         LinearLayout transactionLayout = new LinearLayout(this);
         transactionLayout.setOrientation(LinearLayout.HORIZONTAL);
         transactionLayout.setPadding(10, 10, 10, 10);
 
         ImageView transactionIcon = new ImageView(this);
         transactionIcon.setLayoutParams(new LinearLayout.LayoutParams(48, 48));
+
         dashboardViewModel.getCategoryIconById(transaction.getDanhMucId(), danhMuc -> {
-            Bitmap categoryIcon;
             if (danhMuc != null) {
                 byte[] iconBytes = danhMuc.getIcon();
-                categoryIcon = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+                Bitmap categoryIcon = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+                transactionIcon.setImageBitmap(categoryIcon);
+
+                // Tạo hình tròn cho biểu tượng danh mục
+                GradientDrawable circleDrawable = new GradientDrawable();
+                circleDrawable.setShape(GradientDrawable.OVAL);
+                circleDrawable.setColor(Color.parseColor(danhMuc.getMauSac()));
+                transactionIcon.setBackground(circleDrawable);
+                transactionIcon.setClipToOutline(true);
             } else {
-                categoryIcon = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.ic_unknown);
+                transactionIcon.setImageResource(R.drawable.ic_unknown);
             }
-            transactionIcon.setImageBitmap(categoryIcon);
         });
+
         transactionLayout.addView(transactionIcon);
 
         TextView transactionName = new TextView(this);
@@ -463,23 +625,40 @@ public class DashboardActivity extends AppCompatActivity {
         dashboardViewModel.getCategoryById(transaction.getDanhMucId()).observe(this, danhMuc -> {
             if (danhMuc != null) {
                 transactionName.setText(danhMuc.getTenDanhMuc());
-                Bitmap categoryIcon = BitmapFactory.decodeByteArray(danhMuc.getIcon(), 0, danhMuc.getIcon().length);
-                transactionIcon.setImageBitmap(categoryIcon);
             } else {
                 transactionName.setText("Unknown");
-                transactionIcon.setImageResource(R.drawable.ic_unknown);
             }
         });
 
         transactionLayout.addView(transactionName);
 
+        // Tính phần trăm của giao dịch
+        double percentage = (transaction.getSoTien() / totalAmount) * 100;
+
+        // Hiển thị phần trăm
+        TextView transactionPercentage = new TextView(this);
+        transactionPercentage.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        transactionPercentage.setText(String.format("%.1f%%", percentage));
+        transactionPercentage.setTextColor(getResources().getColor(R.color.Gray));
+        transactionPercentage.setTextSize(14);
+        transactionPercentage.setPadding(8, 0, 8, 0);
+        transactionLayout.addView(transactionPercentage);
+
+        // Hiển thị số tiền
         TextView transactionAmount = new TextView(this);
-        transactionAmount.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        transactionAmount.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
         transactionAmount.setText(String.format("%,.0f đ", transaction.getSoTien()));
         transactionAmount.setTextColor(getResources().getColor(R.color.Gray));
         transactionAmount.setTextSize(14);
         transactionLayout.addView(transactionAmount);
 
+        // Thêm giao dịch vào container
         LinearLayout transactionContainer = findViewById(R.id.transaction_list);
         transactionContainer.addView(transactionLayout);
     }
