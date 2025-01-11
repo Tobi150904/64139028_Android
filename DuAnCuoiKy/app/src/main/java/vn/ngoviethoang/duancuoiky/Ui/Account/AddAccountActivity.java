@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import vn.ngoviethoang.duancuoiky.R;
@@ -55,7 +56,10 @@ public class AddAccountActivity extends AppCompatActivity {
             selectedIconBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
             byte[] iconBytes = outputStream.toByteArray();
 
-            TaiKhoan newAccount = new TaiKhoan(accountName, amount, iconBytes, new Date());
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            String currentDate = sdf.format(new Date());
+
+            TaiKhoan newAccount = new TaiKhoan(accountName, amount, iconBytes, currentDate);
             viewModel.addAccount(newAccount);
 
             Toast.makeText(this, "Tài khoản đã được thêm!", Toast.LENGTH_SHORT).show();
@@ -70,7 +74,7 @@ public class AddAccountActivity extends AppCompatActivity {
                 }
                 selectedIconBitmap = ((BitmapDrawable) icon.getDrawable()).getBitmap();
                 selectedIconView = (ImageView) v;
-                selectedIconView.setBackgroundResource(R.drawable.selected_icon); // Highlight selected icon
+                selectedIconView.setBackgroundResource(R.drawable.selected_icon); 
             });
         }
     }

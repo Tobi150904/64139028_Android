@@ -70,6 +70,7 @@ public class AddTransferActivity extends AppCompatActivity {
         accountViewModel.loadAccounts();
     }
 
+    // Hiển thị dialog chọn tài khoản
     private void showAccountsDialog(boolean isFromAccount) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_accounts);
@@ -125,6 +126,7 @@ public class AddTransferActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    // Tạo layout cho mỗi tài khoản trong dialog
     private LinearLayout createAccountLayout(TaiKhoan account, Dialog dialog) {
         LinearLayout accountLayout = new LinearLayout(this);
         accountLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -182,6 +184,7 @@ public class AddTransferActivity extends AppCompatActivity {
         return accountLayout;
     }
 
+    // Lấy tài khoản được chọn từ tên tài khoản
     private TaiKhoan getSelectedTaiKhoan(String accountName) {
         List<TaiKhoan> accounts = accountViewModel.getAccounts().getValue();
         if (accounts != null) {
@@ -194,6 +197,7 @@ public class AddTransferActivity extends AppCompatActivity {
         return null;
     }
 
+    // Hiển thị dialog chọn ngày
     private void showDatePickerDialog() {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(
@@ -210,11 +214,13 @@ public class AddTransferActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+    // Cập nhật hiển thị ngày được chọn
     private void updateDateDisplay() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         tvDate.setText(sdf.format(selectedDate.getTime()));
     }
 
+    // Thực hiện chuyển khoản
     private void performTransfer() {
         if (selectedFromAccount == null || selectedToAccount == null) {
             Toast.makeText(this, "Vui lòng chọn tài khoản nguồn và đích", Toast.LENGTH_SHORT).show();

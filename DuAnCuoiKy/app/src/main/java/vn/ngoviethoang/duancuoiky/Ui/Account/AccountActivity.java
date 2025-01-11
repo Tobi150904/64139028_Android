@@ -1,4 +1,3 @@
-// AccountActivity.java
 package vn.ngoviethoang.duancuoiky.Ui.Account;
 
 import android.content.Intent;
@@ -54,7 +53,7 @@ public class AccountActivity extends AppCompatActivity {
 
         addAccountButton.setOnClickListener(v -> startActivity(new Intent(this, AddAccountActivity.class)));
         transactionTransfer.setOnClickListener(v -> startActivity(new Intent(this, AddTransferActivity.class)));
-        transferHistory.setOnClickListener(v -> startActivity(new Intent(this, TransferActivity.class)));
+        transferHistory.setOnClickListener(v -> startActivity(new Intent(this, TransferHistoryActivity.class)));
 
         viewModel.loadAccounts();
 
@@ -84,6 +83,7 @@ public class AccountActivity extends AppCompatActivity {
         });
     }
 
+    // Cập nhật giao diện danh sách tài khoản
     private void updateAccountsUI(List<TaiKhoan> accounts) {
         accountsContainer.removeAllViews();
         for (TaiKhoan account : accounts) {
