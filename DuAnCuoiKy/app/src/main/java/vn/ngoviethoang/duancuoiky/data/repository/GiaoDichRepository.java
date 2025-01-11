@@ -6,6 +6,7 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.Date;
 import java.util.List;
 
 import vn.ngoviethoang.duancuoiky.data.dao.GiaoDichDao;
@@ -33,6 +34,10 @@ public class GiaoDichRepository {
 
     public LiveData<List<GiaoDich>> getGiaoDichByLoai(String loai) {
         return giaoDichDao.getGiaoDichByLoai(loai);
+    }
+
+    public LiveData<List<GiaoDich>> getGiaoDichByLoaiAndDateRange(String loai, Date startDate, Date endDate) {
+        return giaoDichDao.getGiaoDichByLoaiAndDateRange(loai, startDate, endDate);
     }
 
     public LiveData<List<GiaoDich>> getAllGiaoDich() {

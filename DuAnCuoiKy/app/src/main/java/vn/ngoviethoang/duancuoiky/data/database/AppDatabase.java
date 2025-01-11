@@ -19,7 +19,7 @@ import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 import vn.ngoviethoang.duancuoiky.data.entity.User;
 
-@Database(entities = {GiaoDich.class, DanhMuc.class, TaiKhoan.class, User.class}, version = 3, exportSchema = false)
+@Database(entities = {GiaoDich.class, DanhMuc.class, TaiKhoan.class, User.class}, version = 2, exportSchema = false)
 @TypeConverters({DateConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
     public abstract GiaoDichDao giaoDichDao();

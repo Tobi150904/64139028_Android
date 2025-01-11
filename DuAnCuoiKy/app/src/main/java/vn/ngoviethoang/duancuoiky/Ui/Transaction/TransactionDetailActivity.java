@@ -11,11 +11,14 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+
+import java.util.Calendar;
 import java.util.List;
+
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
 import vn.ngoviethoang.duancuoiky.Ui.Dashboard.DashboardActivity;
@@ -27,6 +30,8 @@ public class TransactionDetailActivity extends AppCompatActivity {
     private TextView tabExpenses, tabIncome, tabDay, tabWeek, tabMonth, tabYear;
     private ImageView iconPrevious, iconNext, iconBack;
     private LinearLayout transactionListLayout;
+    private String selectedRange = "day";
+    private Calendar currentCalendar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,6 +53,7 @@ public class TransactionDetailActivity extends AppCompatActivity {
         transactionListLayout = findViewById(R.id.transaction_list);
 
         setupListeners();
+        observeTransactions();
 
         transactionViewModel.getDateRange().observe(this, date -> dateRange.setText(date));
 
@@ -55,6 +61,7 @@ public class TransactionDetailActivity extends AppCompatActivity {
         selectDateRangeTab(tabDay, "day");
     }
 
+    // Thiết lập các sự kiện
     private void setupListeners() {
         iconBack.setOnClickListener(v -> {
             Intent intent = new Intent(TransactionDetailActivity.this, DashboardActivity.class);
@@ -62,51 +69,111 @@ public class TransactionDetailActivity extends AppCompatActivity {
             finish();
         });
 
-        tabExpenses.setOnClickListener(v -> selectTab(tabExpenses, "chi_phi"));
-        tabIncome.setOnClickListener(v -> selectTab(tabIncome, "thu_nhap"));
+        tabExpenses.setOnClickListener(v -> {
+            selectTab(tabExpenses, "chi_phi");
+            filterTransactions("chi_phi", getSelectedDateRange());
+        });
 
-        tabDay.setOnClickListener(v -> selectDateRangeTab(tabDay, "day"));
-        tabWeek.setOnClickListener(v -> selectDateRangeTab(tabWeek, "week"));
-        tabMonth.setOnClickListener(v -> selectDateRangeTab(tabMonth, "month"));
-        tabYear.setOnClickListener(v -> selectDateRangeTab(tabYear, "year"));
+        tabIncome.setOnClickListener(v -> {
+            selectTab(tabIncome, "thu_nhap");
+            filterTransactions("thu_nhap", getSelectedDateRange());
+        });
+
+        tabDay.setOnClickListener(v -> {
+            selectDateRangeTab(tabDay, "day");
+            transactionViewModel.updateTransactions(getSelectedTransactionType(), "day");
+        });
+
+        tabWeek.setOnClickListener(v -> {
+            selectDateRangeTab(tabWeek, "week");
+            transactionViewModel.updateTransactions(getSelectedTransactionType(), "week");
+        });
+
+        tabMonth.setOnClickListener(v -> {
+            selectDateRangeTab(tabMonth, "month");
+            transactionViewModel.updateTransactions(getSelectedTransactionType(), "month");
+        });
+
+        tabYear.setOnClickListener(v -> {
+            selectDateRangeTab(tabYear, "year");
+            transactionViewModel.updateTransactions(getSelectedTransactionType(), "year");
+        });
 
         iconPrevious.setOnClickListener(v -> navigateDateRange(-1));
         iconNext.setOnClickListener(v -> navigateDateRange(1));
     }
 
+    // Lấy loại giao dịch được chọn
+    private String getSelectedTransactionType() {
+        if (tabExpenses.isSelected()) {
+            return "chi_phi";
+        } else if (tabIncome.isSelected()) {
+            return "thu_nhap";
+        } else {
+            return "chi_phi";
+        }
+    }
+
+    // Lấy phạm vi ngày được chọn
+    private String getSelectedDateRange() {
+        return selectedRange;
+    }
+
+    // Lọc giao dịch
+    private void filterTransactions(String type, String range) {
+        transactionViewModel.updateTransactions(type, range);
+    }
+
+    // Quan sát danh sách giao dịch
+    private void observeTransactions() {
+        transactionViewModel.getGiaoDichList().observe(this, this::updateTransactionList);
+    }
+
+    // Chọn tab
     private void selectTab(TextView selectedTab, String tab) {
         resetTab(tabExpenses);
         resetTab(tabIncome);
         highlightTab(selectedTab);
-        transactionViewModel.updateTransactions(tab);
-        transactionViewModel.getGiaoDichList().observe(this, this::updateTransactionList);
+        selectedTab.setSelected(true);
+        filterTransactions(tab, getSelectedDateRange());
     }
 
+    // Chọn tab phạm vi ngày
     private void selectDateRangeTab(TextView selectedTab, String range) {
         resetTab(tabDay);
         resetTab(tabWeek);
         resetTab(tabMonth);
         resetTab(tabYear);
         highlightTab(selectedTab);
-        transactionViewModel.updateDateRange(range, 0);
+        selectedRange = range;
+        if (!range.equals("year") && !range.equals("month") && !range.equals("week")) {
+            currentCalendar = Calendar.getInstance();
+        }
+        filterTransactions(getSelectedTransactionType(), range);
     }
 
+    // Đặt lại tab
     private void resetTab(TextView tab) {
         tab.setTextColor(getResources().getColor(R.color.Gray));
         tab.setTypeface(null, Typeface.NORMAL);
         tab.setPaintFlags(tab.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
+        tab.setSelected(false);
     }
 
+    // Làm nổi bật tab
     private void highlightTab(TextView tab) {
         tab.setTextColor(getResources().getColor(R.color.Red));
         tab.setTypeface(null, Typeface.BOLD);
         tab.setPaintFlags(tab.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        tab.setSelected(true);
     }
 
+    // Điều hướng phạm vi ngày
     private void navigateDateRange(int direction) {
         transactionViewModel.navigateDateRange(direction);
     }
 
+    // Cập nhật danh sách giao dịch
     private void updateTransactionList(List<GiaoDich> giaoDichList) {
         transactionListLayout.removeAllViews();
         for (GiaoDich giaoDich : giaoDichList) {
@@ -114,6 +181,7 @@ public class TransactionDetailActivity extends AppCompatActivity {
         }
     }
 
+    // Thêm giao dịch vào UI
     private void addTransactionToUI(GiaoDich transaction) {
         LinearLayout transactionLayout = new LinearLayout(this);
         transactionLayout.setOrientation(LinearLayout.VERTICAL);
@@ -121,7 +189,7 @@ public class TransactionDetailActivity extends AppCompatActivity {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(0, 8, 0, 0); // Set top margin to 8dp
+        layoutParams.setMargins(0, 8, 0, 0);
         transactionLayout.setLayoutParams(layoutParams);
 
         TextView dateTextView = new TextView(this);
@@ -143,7 +211,6 @@ public class TransactionDetailActivity extends AppCompatActivity {
             if (danhMuc != null) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(danhMuc.getIcon(), 0, danhMuc.getIcon().length);
                 transactionIcon.setImageBitmap(bitmap);
-
                 GradientDrawable circleDrawable = new GradientDrawable();
                 circleDrawable.setShape(GradientDrawable.OVAL);
                 circleDrawable.setColor(Color.parseColor(danhMuc.getMauSac()));

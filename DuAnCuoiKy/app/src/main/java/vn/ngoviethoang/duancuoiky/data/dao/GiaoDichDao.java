@@ -21,12 +21,12 @@ public interface GiaoDichDao {
     @Query("SELECT * FROM giao_dich WHERE loai = :loai")
     LiveData<List<GiaoDich>> getGiaoDichByLoai(String loai);
 
-    @Query("SELECT * FROM giao_dich WHERE ngay BETWEEN :startDate AND :endDate")
-    LiveData<List<GiaoDich>> getGiaoDichByDateRange(Date startDate, Date endDate);
-
-    @Delete
-    void deleteGiaoDich(GiaoDich giaoDich);
+    @Query("SELECT * FROM giao_dich WHERE loai = :loai AND ngay BETWEEN :startDate AND :endDate")
+    LiveData<List<GiaoDich>> getGiaoDichByLoaiAndDateRange(String loai, Date startDate, Date endDate);
 
     @Query("SELECT * FROM giao_dich")
     LiveData<List<GiaoDich>> getAllGiaoDich();
+
+    @Query("SELECT * FROM giao_dich WHERE ngay LIKE :dateRange AND loai = :type")
+    public abstract LiveData<List<GiaoDich>> getFilteredGiaoDich(String dateRange, String type);
 }
