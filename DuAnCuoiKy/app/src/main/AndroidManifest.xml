@@ -38,6 +38,9 @@
         <activity android:name=".Ui.Account.AccountActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".Ui.Statistics.StatisticsActivity"
+            android:exported="true">
+        </activity>
         <activity android:name=".Ui.Account.TransferHistoryActivity"
             android:exported="true">
         </activity>
@@ -47,6 +50,7 @@
         <activity android:name=".Ui.Category.CategoryActivity"
             android:exported="true">
         </activity>
+
     </application>
 
 </manifest>

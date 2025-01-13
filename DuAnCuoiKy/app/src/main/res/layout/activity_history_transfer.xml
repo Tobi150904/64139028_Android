@@ -100,14 +100,6 @@
                 android:text="Năm"
                 android:textColor="@color/Gray"
                 android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/tab_custom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Khoảng thời gian"
-                android:textColor="@color/Gray"
-                android:textSize="14sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

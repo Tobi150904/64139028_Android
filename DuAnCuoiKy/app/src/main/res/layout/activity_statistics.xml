@@ -15,7 +15,7 @@
         <RelativeLayout
             android:id="@+id/header"
             android:layout_width="412dp"
-            android:layout_height="130dp"
+            android:layout_height="106dp"
             android:background="@drawable/card_background"
             android:backgroundTint="@color/Green"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,7 +31,7 @@
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
                 <ImageView
-                    android:id="@+id/ic_menu"
+                    android:id="@+id/icon_menu"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="start"
@@ -46,45 +46,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="50dp"
                 android:text="Thống kê"
                 android:textColor="@color/White"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/header_tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="30dp"
-                android:gravity="center"
-                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tab_expenses"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="CHI PHÍ"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tab_income"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="THU NHẬP"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
         </RelativeLayout>
 
         <LinearLayout
@@ -146,13 +114,6 @@
                     android:textColor="@color/Gray"
                     android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/tab_custom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Khoảng thời gian"
-                    android:textColor="@color/Gray"
-                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -197,4 +158,10 @@
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/menu_dashboard" />
 </androidx.drawerlayout.widget.DrawerLayout>

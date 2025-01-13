@@ -41,7 +41,8 @@ import java.util.Map;
 import vn.ngoviethoang.duancuoiky.R;
 import vn.ngoviethoang.duancuoiky.Ui.Account.AccountActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Category.CategoryActivity;
-import vn.ngoviethoang.duancuoiky.Ui.Components.PieChartComponent;
+import vn.ngoviethoang.duancuoiky.Ui.Login.LoginActivity;
+import vn.ngoviethoang.duancuoiky.Ui.Statistics.StatisticsActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.AddTransactionActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
 import vn.ngoviethoang.duancuoiky.data.entity.GiaoDich;
@@ -197,7 +198,7 @@ public class DashboardActivity extends AppCompatActivity {
                 // Tạo đối tượng PieData và gán vào biểu đồ
                 PieData pieData = new PieData(dataSet);
                 pieChart.setData(pieData);
-                pieChart.setCenterText(String.format("%,.0f đ", totalAmount)); // Hiển thị tổng số tiền
+                pieChart.setCenterText(String.format("%,.0f đ", totalAmount));
                 pieChart.invalidate(); // Vẽ lại biểu đồ
             });
         }
@@ -208,7 +209,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         dashboardViewModel.getDateRange().observe(this, dateRange::setText);
-        dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,.2f VND", balance)));
+        dashboardViewModel.getTotalBalance().observe(this, balance -> totalBalanceAmount.setText(String.format("%,.0f VND", balance)));
         dashboardViewModel.getTransactions().observe(this, this::updateTransactionUI);
     }
 
@@ -236,38 +237,22 @@ public class DashboardActivity extends AppCompatActivity {
 
         tabDay.setOnClickListener(v -> {
             selectDateRangeTab(tabDay, "day");
-            if (currentTab.equals("expenses")) {
-                updateFilteredTransactions("chi_phi", "day");
-            } else {
-                updateFilteredTransactions("thu_nhap", "day");
-            }
+            updateFilteredTransactions(currentTab.equals("expenses") ? "chi_phi" : "thu_nhap", "day");
         });
 
         tabWeek.setOnClickListener(v -> {
             selectDateRangeTab(tabWeek, "week");
-            if (currentTab.equals("expenses")) {
-                updateFilteredTransactions("chi_phi", "week");
-            } else {
-                updateFilteredTransactions("thu_nhap", "week");
-            }
+            updateFilteredTransactions(currentTab.equals("expenses") ? "chi_phi" : "thu_nhap", "week");
         });
 
         tabMonth.setOnClickListener(v -> {
             selectDateRangeTab(tabMonth, "month");
-            if (currentTab.equals("expenses")) {
-                updateFilteredTransactions("chi_phi", "month");
-            } else {
-                updateFilteredTransactions("thu_nhap", "month");
-            }
+            updateFilteredTransactions(currentTab.equals("expenses") ? "chi_phi" : "thu_nhap", "month");
         });
 
         tabYear.setOnClickListener(v -> {
             selectDateRangeTab(tabYear, "year");
-            if (currentTab.equals("expenses")) {
-                updateFilteredTransactions("chi_phi", "year");
-            } else {
-                updateFilteredTransactions("thu_nhap", "year");
-            }
+            updateFilteredTransactions(currentTab.equals("expenses") ? "chi_phi" : "thu_nhap", "year");
         });
 
         tabCustom.setOnClickListener(v -> showDatePickerDialog());
@@ -282,7 +267,7 @@ public class DashboardActivity extends AppCompatActivity {
                 return true;
             }
             if (item.getItemId() == R.id.nav_chart) {
-                startActivity(new Intent(this, TransactionDetailActivity.class));
+                startActivity(new Intent(this, StatisticsActivity.class));
                 return true;
             }
             if (item.getItemId() == R.id.nav_category) {
@@ -291,6 +276,10 @@ public class DashboardActivity extends AppCompatActivity {
             }
             if (item.getItemId() == R.id.nav_settings) {
                 startActivity(new Intent(this, TransactionDetailActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.nav_logout) {
+                startActivity(new Intent(this, LoginActivity.class));
                 return true;
             }
 
@@ -328,6 +317,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         highlightTab(selectedTab);
         dashboardViewModel.switchTab(tab);
+        String dateRange = dashboardViewModel.getDateRange().getValue();
+        updateFilteredTransactions(currentTab.equals("expenses") ? "chi_phi" : "thu_nhap", dateRange);
     }
 
     private void resetTab(TextView tab) {
@@ -355,6 +346,7 @@ public class DashboardActivity extends AppCompatActivity {
     private void updateFilteredTransactions(String loai, String range) {
         dashboardViewModel.getFilteredTransactions(loai, range).observe(this, transactions -> {
             updateTransactionUI(transactions);
+            updatePieChart(transactions);
         });
     }
 

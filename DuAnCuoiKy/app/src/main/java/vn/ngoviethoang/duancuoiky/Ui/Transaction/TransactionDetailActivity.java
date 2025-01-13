@@ -26,7 +26,7 @@ import vn.ngoviethoang.duancuoiky.Ui.Dashboard.DashboardActivity;
 public class TransactionDetailActivity extends AppCompatActivity {
 
     private TransactionViewModel transactionViewModel;
-    private TextView dateRange;
+    private TextView dateRange, totalText;
     private TextView tabExpenses, tabIncome, tabDay, tabWeek, tabMonth, tabYear;
     private ImageView iconPrevious, iconNext, iconBack;
     private LinearLayout transactionListLayout;
@@ -41,6 +41,7 @@ public class TransactionDetailActivity extends AppCompatActivity {
         transactionViewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
 
         dateRange = findViewById(R.id.date_range);
+        totalText = findViewById(R.id.total_text);
         tabExpenses = findViewById(R.id.tab_expenses);
         tabIncome = findViewById(R.id.tab_income);
         tabDay = findViewById(R.id.tab_day);
@@ -127,6 +128,14 @@ public class TransactionDetailActivity extends AppCompatActivity {
     // Quan sát danh sách giao dịch
     private void observeTransactions() {
         transactionViewModel.getGiaoDichList().observe(this, this::updateTransactionList);
+
+        transactionViewModel.getTotalAmountLiveData().observe(this, totalAmount -> {
+            if (totalAmount != null) {
+                totalText.setText(String.format("%,.0f đ", totalAmount));
+            } else {
+                totalText.setText("0 đ");
+            }
+        });
     }
 
     // Chọn tab
@@ -176,9 +185,14 @@ public class TransactionDetailActivity extends AppCompatActivity {
     // Cập nhật danh sách giao dịch
     private void updateTransactionList(List<GiaoDich> giaoDichList) {
         transactionListLayout.removeAllViews();
+        double totalAmount = 0;
+
         for (GiaoDich giaoDich : giaoDichList) {
             addTransactionToUI(giaoDich);
+            totalAmount += giaoDich.getSoTien();
         }
+
+        totalText.setText(String.format("Tổng cộng: %,.0f đ", totalAmount));
     }
 
     // Thêm giao dịch vào UI

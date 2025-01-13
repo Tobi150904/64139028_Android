@@ -17,7 +17,9 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.List;
 
 import vn.ngoviethoang.duancuoiky.R;
+import vn.ngoviethoang.duancuoiky.Ui.Category.CategoryActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Dashboard.DashboardActivity;
+import vn.ngoviethoang.duancuoiky.Ui.Statistics.StatisticsActivity;
 import vn.ngoviethoang.duancuoiky.Ui.Transaction.TransactionDetailActivity;
 import vn.ngoviethoang.duancuoiky.data.entity.TaiKhoan;
 
@@ -67,17 +69,18 @@ public class AccountActivity extends AppCompatActivity {
                 return true;
             }
             if (item.getItemId() == R.id.nav_chart) {
-                startActivity(new Intent(this, TransactionDetailActivity.class));
+                startActivity(new Intent(this, StatisticsActivity.class));
                 return true;
             }
             if (item.getItemId() == R.id.nav_category) {
-                startActivity(new Intent(this, TransactionDetailActivity.class));
+                startActivity(new Intent(this, CategoryActivity.class));
                 return true;
             }
             if (item.getItemId() == R.id.nav_settings) {
                 startActivity(new Intent(this, TransactionDetailActivity.class));
                 return true;
             }
+
             drawerLayout.closeDrawer(navigationView);
             return false;
         });

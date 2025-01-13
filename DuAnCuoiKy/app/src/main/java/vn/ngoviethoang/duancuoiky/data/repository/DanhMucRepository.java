@@ -14,9 +14,6 @@ import vn.ngoviethoang.duancuoiky.data.dao.DanhMucDao;
 import vn.ngoviethoang.duancuoiky.data.database.AppDatabase;
 import vn.ngoviethoang.duancuoiky.data.entity.DanhMuc;
 
-// DanhMucRepository.java
-import android.os.AsyncTask;
-
 public class DanhMucRepository {
     private final DanhMucDao danhMucDao;
 

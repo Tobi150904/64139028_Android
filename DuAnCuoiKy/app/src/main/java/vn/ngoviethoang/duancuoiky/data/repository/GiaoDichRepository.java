@@ -1,4 +1,3 @@
-// GiaoDichRepository.java
 package vn.ngoviethoang.duancuoiky.data.repository;
 
 import android.content.Context;
@@ -36,11 +35,12 @@ public class GiaoDichRepository {
         return giaoDichDao.getGiaoDichByLoai(loai);
     }
 
-    public LiveData<List<GiaoDich>> getGiaoDichByLoaiAndDateRange(String loai, Date startDate, Date endDate) {
-        return giaoDichDao.getGiaoDichByLoaiAndDateRange(loai, startDate, endDate);
-    }
 
     public LiveData<List<GiaoDich>> getAllGiaoDich() {
         return giaoDichDao.getAllGiaoDich();
+    }
+
+    public LiveData<List<GiaoDich>> getGiaoDichByDateRange(Date startDate, Date endDate) {
+        return giaoDichDao.getGiaoDichByDateRange(startDate, endDate);
     }
 }

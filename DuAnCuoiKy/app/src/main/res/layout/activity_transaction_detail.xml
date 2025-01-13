@@ -204,31 +204,13 @@
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/total_text"
                     android:layout_width="238dp"
                     android:layout_height="wrap_content"
                     android:text="Tổng cộng"
                     android:textColor="@color/Black"
                     android:textSize="14sp" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Theo ngày"
-                        android:textColor="@color/Black"
-                        android:textSize="14sp" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Show Accounts"
-                        android:src="@drawable/ic_down" />
-                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout

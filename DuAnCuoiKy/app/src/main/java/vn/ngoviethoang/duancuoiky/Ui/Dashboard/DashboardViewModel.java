@@ -3,6 +3,8 @@ package vn.ngoviethoang.duancuoiky.Ui.Dashboard;
 import android.app.Application;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -119,35 +121,28 @@ public class DashboardViewModel extends AndroidViewModel {
 
         giaoDichRepository.getAllGiaoDich().observeForever(transactions -> {
             List<GiaoDich> filtered = new ArrayList<>();
-            SimpleDateFormat formatter;
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-            if (range.contains("-")) {
-                // Lọc giao dịch theo tuần
-                String[] dates = range.split(" - ");
-                formatter = new SimpleDateFormat("dd/MM/yyyy");
-                try {
+            try {
+                if (range.contains("-")) {
+                    // Lọc theo tuần
+                    String[] dates = range.split(" - ");
                     Date startDate = formatter.parse(dates[0]);
                     Date endDate = formatter.parse(dates[1]);
 
                     for (GiaoDich transaction : transactions) {
                         if (transaction.getLoai().equals(loai)) {
                             Date transactionDate = formatter.parse(transaction.getNgay());
-                            if ((transactionDate.after(startDate) && transactionDate.before(endDate)) || transactionDate.equals(startDate) || transactionDate.equals(endDate)) {
+                            if (transactionDate != null && !transactionDate.before(startDate) && !transactionDate.after(endDate)) {
                                 filtered.add(transaction);
                             }
                         }
                     }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            } else if (range.contains("/")) {
-            // Lọc giao dịch theo ngày hoặc tháng
-            if (range.length() == 10) {
-                // Lọc theo ngày
-                formatter = new SimpleDateFormat("dd/MM/yyyy");
-                try {
-                    Date rangeDate = formatter.parse(range);
-                    if (rangeDate != null) {
+                } else if (range.contains("/")) {
+                    if (range.length() == 10) {
+                        // Lọc theo ngày
+                        Date rangeDate = formatter.parse(range);
+
                         for (GiaoDich transaction : transactions) {
                             if (transaction.getLoai().equals(loai)) {
                                 Date transactionDate = formatter.parse(transaction.getNgay());
@@ -156,18 +151,11 @@ public class DashboardViewModel extends AndroidViewModel {
                                 }
                             }
                         }
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            } else if (range.length() == 7) {
-                // Lọc theo tháng
-                formatter = new SimpleDateFormat("MM/yyyy");
-                try {
-                    Date rangeDate = formatter.parse(range);
-                    if (rangeDate != null) {
-                        Calendar rangeCalendar = Calendar.getInstance();
-                        rangeCalendar.setTime(rangeDate);
+                    } else if (range.length() == 7) {
+                        // Lọc theo tháng
+                        String[] parts = range.split("/");
+                        int month = Integer.parseInt(parts[0]) - 1; // Tháng bắt đầu từ 0
+                        int year = Integer.parseInt(parts[1]);
 
                         for (GiaoDich transaction : transactions) {
                             if (transaction.getLoai().equals(loai)) {
@@ -176,47 +164,42 @@ public class DashboardViewModel extends AndroidViewModel {
                                     Calendar transactionCalendar = Calendar.getInstance();
                                     transactionCalendar.setTime(transactionDate);
 
-                                    // So sánh tháng và năm
-                                    if (transactionCalendar.get(Calendar.MONTH) == rangeCalendar.get(Calendar.MONTH) &&
-                                            transactionCalendar.get(Calendar.YEAR) == rangeCalendar.get(Calendar.YEAR)) {
+                                    if (transactionCalendar.get(Calendar.MONTH) == month &&
+                                            transactionCalendar.get(Calendar.YEAR) == year) {
                                         filtered.add(transaction);
                                     }
                                 }
                             }
                         }
                     }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else if (range.length() == 4) {
-            // Lọc giao dịch theo năm
-            formatter = new SimpleDateFormat("yyyy");
-            try {
-                Date rangeDate = formatter.parse(range);
-                if (rangeDate != null) {
-                    Calendar rangeCalendar = Calendar.getInstance();
-                    rangeCalendar.setTime(rangeDate);
+                } else if (range.length() == 4) {
+                    // Lọc theo năm
+                    try {
+                        int year = Integer.parseInt(range); // Chuyển đổi range thành số nguyên
 
-                    for (GiaoDich transaction : transactions) {
-                        if (transaction.getLoai().equals(loai)) {
-                            Date transactionDate = formatter.parse(transaction.getNgay());
-                            if (transactionDate != null) {
-                                Calendar transactionCalendar = Calendar.getInstance();
-                                transactionCalendar.setTime(transactionDate);
+                        for (GiaoDich transaction : transactions) {
+                            if (transaction.getLoai().equals(loai)) {
+                                Date transactionDate = formatter.parse(transaction.getNgay());
+                                if (transactionDate != null) {
+                                    Calendar transactionCalendar = Calendar.getInstance();
+                                    transactionCalendar.setTime(transactionDate);
 
-                                // So sánh năm
-                                if (transactionCalendar.get(Calendar.YEAR) == rangeCalendar.get(Calendar.YEAR)) {
-                                    filtered.add(transaction);
+                                    if (transactionCalendar.get(Calendar.YEAR) == year) {
+                                        filtered.add(transaction);
+                                    }
                                 }
                             }
                         }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        // Xử lý lỗi nếu range không phải là số hợp lệ
+                        Log.e("DashboardViewModel", "Invalid year format: " + range);
                     }
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }
+
             filteredTransactions.setValue(filtered);
         });
 
@@ -232,8 +215,10 @@ public class DashboardViewModel extends AndroidViewModel {
     }
 
     public void initializeDashboard() {
-        updateDateRange("day", 0);
-        switchTab("expenses");
+        updateDateRange("day", 0); // Mặc định phạm vi thời gian là ngày
+        switchTab("expenses"); // Mặc định tab là chi phí
+        loadAccounts(); // Tải danh sách tài khoản
+        loadTransactions(); // Tải danh sách giao dịch
     }
 
     public void loadAccounts() {

@@ -41,6 +41,8 @@ public class TransactionViewModel extends AndroidViewModel {
     private Date endDate;
     private List<GiaoDich> allTransactions;
     private List<GiaoDich> filteredTransactions;
+    private final MutableLiveData<Double> totalAmountLiveData = new MutableLiveData<>();
+
 
     public TransactionViewModel(@NonNull Application application) {
         super(application);
@@ -84,11 +86,6 @@ public class TransactionViewModel extends AndroidViewModel {
         });
     }
 
-    // Lấy danh sách giao dịch theo loại
-    public LiveData<List<GiaoDich>> getGiaoDichByLoai(String loai) {
-        return giaoDichRepository.getGiaoDichByLoai(loai);
-    }
-
     // Lấy giao dịch hiện tại
     public LiveData<GiaoDich> getGiaoDich() {
         return giaoDichLiveData;
@@ -97,11 +94,6 @@ public class TransactionViewModel extends AndroidViewModel {
     // Lấy thông báo lỗi
     public LiveData<String> getErrorMessage() {
         return errorMessage;
-    }
-
-    // Lấy danh sách tài khoản
-    public LiveData<List<TaiKhoan>> getAccounts() {
-        return accounts;
     }
 
     // Lấy phạm vi ngày hiện tại
@@ -244,18 +236,16 @@ public class TransactionViewModel extends AndroidViewModel {
         loadFilteredTransactions();
     }
 
+    public LiveData<Double> getTotalAmountLiveData() {
+        return totalAmountLiveData;
+    }
+
     // Tải danh sách giao dịch đã lọc
     private void loadFilteredTransactions() {
         filteredTransactions.clear();
-        // Thêm debug xử lý lỗi
-        Log.d("DEBUG", "Danh sách giao dịch: " + allTransactions.size());
-        Log.d("DEBUG", "Ngày bắt đầu: " + startDate);
-        Log.d("DEBUG", "Ngày kết thúc: " + endDate);
-        Log.d("DEBUG", "Loại giao dịch: " + selectedType);
-        Log.d("DEBUG", "Loại thời gian: " + selectedRange);
+        double totalAmount = 0;
 
         for (GiaoDich giaoDich : allTransactions) {
-            Log.d("DEBUG", "Kiểm tra giao dịch: " + giaoDich.getNgay() + " - " + giaoDich.getLoai());
             if (giaoDich.getLoai().equals(selectedType)) {
                 if (giaoDich.getNgay() != null && !giaoDich.getNgay().isEmpty()) {
                     try {
@@ -263,12 +253,16 @@ public class TransactionViewModel extends AndroidViewModel {
                         if (giaoDichDate != null) {
                             if (selectedRange.equals("day") && isSameDay(giaoDichDate, startDate)) {
                                 filteredTransactions.add(giaoDich);
+                                totalAmount += giaoDich.getSoTien();
                             } else if (selectedRange.equals("week") && isSameWeek(giaoDichDate, startDate, endDate)) {
                                 filteredTransactions.add(giaoDich);
+                                totalAmount += giaoDich.getSoTien();
                             } else if (selectedRange.equals("month") && isSameMonth(giaoDichDate, startDate)) {
                                 filteredTransactions.add(giaoDich);
+                                totalAmount += giaoDich.getSoTien();
                             } else if (selectedRange.equals("year") && isSameYear(giaoDichDate, startDate)) {
                                 filteredTransactions.add(giaoDich);
+                                totalAmount += giaoDich.getSoTien();
                             }
                         }
                     } catch (ParseException e) {
@@ -280,7 +274,8 @@ public class TransactionViewModel extends AndroidViewModel {
                 }
             }
         }
-        Log.d("DEBUG", "Lọc giao dịch: " + filteredTransactions.size());
+
+        totalAmountLiveData.setValue(totalAmount);
         transactionsLiveData.setValue(filteredTransactions);
     }
 
